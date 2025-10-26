@@ -1,4 +1,4 @@
-# TODO for Making Contact Info Side by Side on Mobile
+# TODO for Fixing Contact Info Layout on Mobile
 
-- [x] Modify the grid layout in src/components/Contact.tsx to display phone, email, and location side by side on mobile screens instead of stacked vertically
+- [x] Change the layout from grid to flexbox on mobile to force phone, email, and location into a single horizontal row
 - [x] Test the changes by running the development server and verifying the layout on mobile view
