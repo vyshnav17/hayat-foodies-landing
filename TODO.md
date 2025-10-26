@@ -1,5 +1,5 @@
-# TODO for Moving WhatsApp Button to Contact Component
+# TODO for Removing Twitter and YouTube Icons from Footer
 
-- [x] Remove WhatsApp button from Footer.tsx
-- [x] Update Contact.tsx to import WhatsApp logo and add it to the existing "Contact Us Today" button with the link
-- [x] Test the changes by running the development server and verifying the button works in the contact section
+- [x] Remove Twitter and YouTube icons from Footer.tsx
+- [x] Update imports to remove Twitter and Youtube from lucide-react
+- [ ] Commit the changes to the repository

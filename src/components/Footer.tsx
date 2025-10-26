@@ -1,4 +1,4 @@
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import { Facebook, Instagram } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -11,41 +11,23 @@ const Footer = () => {
           </p>
           
           <div className="flex justify-center gap-6 pt-4">
-            <a 
-              href="https://facebook.com" 
-              target="_blank" 
+            <a
+              href="https://facebook.com"
+              target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-all duration-300 hover:scale-125 transform"
               aria-label="Facebook"
             >
               <Facebook size={24} />
             </a>
-            <a 
-              href="https://www.instagram.com/hayatfoodsindia/" 
-              target="_blank" 
+            <a
+              href="https://www.instagram.com/hayatfoodsindia/"
+              target="_blank"
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-all duration-300 hover:scale-125 transform"
               aria-label="Instagram"
             >
               <Instagram size={24} />
-            </a>
-            <a 
-              href="https://twitter.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition-all duration-300 hover:scale-125 transform"
-              aria-label="Twitter"
-            >
-              <Twitter size={24} />
-            </a>
-            <a 
-              href="https://youtube.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="hover:opacity-80 transition-all duration-300 hover:scale-125 transform"
-              aria-label="YouTube"
-            >
-              <Youtube size={24} />
             </a>
           </div>
 
