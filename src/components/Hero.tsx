@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-bread.jpg";
+import logo from "@/assets/logo.png";
 
 const Hero = () => {
   const scrollToProducts = () => {
@@ -21,6 +22,11 @@ const Hero = () => {
       
       <div className="container relative z-10 px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center text-white animate-fade-in">
+          <img 
+            src={logo} 
+            alt="Hayat Foods Logo" 
+            className="h-40 md:h-52 mx-auto mb-8 drop-shadow-2xl"
+          />
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             Hayat Foods India
           </h1>
@@ -41,7 +47,7 @@ const Hero = () => {
             <Button 
               size="lg" 
               variant="outline"
-              className="bg-white/10 hover:bg-white/20 text-white border-2 border-white font-semibold text-lg px-8 py-6 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105"
+              className="bg-white/10 hover:bg-white/20 text-white border-2 border-white/80 font-semibold text-lg px-8 py-6 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-105"
               onClick={() => {
                 const contactSection = document.getElementById("contact");
                 contactSection?.scrollIntoView({ behavior: "smooth" });
