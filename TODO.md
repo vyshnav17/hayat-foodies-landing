@@ -1,5 +1,5 @@
-# TODO for Adding WhatsApp Button to Footer
+# TODO for Moving WhatsApp Button to Contact Component
 
-- [x] Add WhatsApp logo import from src/assets/WhatsApp.png
-- [x] Add "Contact Us Today" button with WhatsApp logo that links to https://wa.me/918111928999
-- [x] Test the changes by running the development server and verifying the button works
+- [x] Remove WhatsApp button from Footer.tsx
+- [x] Update Contact.tsx to import WhatsApp logo and add it to the existing "Contact Us Today" button with the link
+- [x] Test the changes by running the development server and verifying the button works in the contact section

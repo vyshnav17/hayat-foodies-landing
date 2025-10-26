@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import whatsAppLogo from "@/assets/WhatsApp.png";
 
 const Contact = () => {
   return (
@@ -45,12 +46,25 @@ const Contact = () => {
           </div>
 
           <div className="animate-scale-in" style={{ animationDelay: '0.3s' }}>
-            <Button 
+            <Button
+              asChild
               size="lg"
               variant="secondary"
               className="font-semibold text-lg px-8 py-6 rounded-full hover:scale-105 transition-transform duration-300"
             >
-              Contact Us Today
+              <a
+                href="https://wa.me/918111928999"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <img
+                  src={whatsAppLogo}
+                  alt="WhatsApp"
+                  className="w-6 h-6"
+                />
+                Contact Us Today
+              </a>
             </Button>
           </div>
         </div>
