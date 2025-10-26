@@ -13,7 +13,7 @@ const Contact = () => {
             Have questions or want to know more about our products? We'd love to hear from you!
           </p>
 
-          <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-8 mb-8 md:mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8 mb-8 md:mb-12">
             <div className="animate-scale-in">
               <div className="inline-flex items-center justify-center w-12 md:w-14 h-12 md:h-14 rounded-full bg-primary-foreground/10 mb-4">
                 <Phone className="w-5 md:w-6 h-5 md:h-6" />
@@ -35,7 +35,7 @@ const Contact = () => {
               <p className="opacity-90">Send us your questions</p>
             </div>
 
-            <div className="animate-scale-in" style={{ animationDelay: '0.2s' }}>
+            <div className="col-span-2 md:col-span-1 animate-scale-in" style={{ animationDelay: '0.2s' }}>
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 mb-4">
                 <MapPin className="w-6 h-6" />
               </div>
