@@ -50,20 +50,20 @@ const Products = () => {
           {products.map((product, index) => (
             <Card 
               key={product.name}
-              className="group overflow-hidden border-border hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-scale-in"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="group overflow-hidden border-border hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 animate-scale-in transform"
+              style={{ animationDelay: `${index * 0.15}s` }}
             >
               <div className="relative h-64 overflow-hidden">
                 <img
                   src={product.image}
                   alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 group-hover:rotate-2"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
               </div>
-              <CardContent className="p-6">
-                <h3 className="text-2xl font-bold mb-2 text-foreground">{product.name}</h3>
-                <p className="text-muted-foreground">{product.description}</p>
+              <CardContent className="p-6 transition-all duration-500">
+                <h3 className="text-2xl font-bold mb-2 text-foreground transition-colors duration-300 group-hover:text-primary">{product.name}</h3>
+                <p className="text-muted-foreground transition-all duration-300">{product.description}</p>
               </CardContent>
             </Card>
           ))}
