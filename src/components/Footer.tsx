@@ -1,4 +1,6 @@
 import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
+import whatsAppLogo from "@/assets/WhatsApp.png";
+import { Button } from "@/components/ui/button";
 
 const Footer = () => {
   return (
@@ -47,6 +49,29 @@ const Footer = () => {
             >
               <Youtube size={24} />
             </a>
+          </div>
+
+          <div className="pt-4">
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="font-semibold text-lg px-8 py-6 rounded-full hover:scale-105 transition-transform duration-300"
+            >
+              <a
+                href="https://wa.me/918111928999"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <img
+                  src={whatsAppLogo}
+                  alt="WhatsApp"
+                  className="w-6 h-6"
+                />
+                Contact Us Today
+              </a>
+            </Button>
           </div>
 
           <p className="text-xs opacity-75 pt-4">
