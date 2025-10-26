@@ -4,6 +4,7 @@ import creamBunImg from "@/assets/cream-bun.jpg";
 import chocolateBunImg from "@/assets/chocolate-bun.jpg";
 import breadImg from "@/assets/bread.jpg";
 import ruskImg from "@/assets/rusk.jpg";
+import babyChocolateBunImg from "@/assets/baby-chocolate-bun.jpg";
 
 const products = [
   {
@@ -20,6 +21,11 @@ const products = [
     name: "Normal Buns",
     description: "Freshly baked, delightfully soft—your perfect companion for any meal",
     image: chocolateBunImg,
+  },
+  {
+    name: "Baby Chocolate Bun",
+    description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
+    image: babyChocolateBunImg,
   },
   {
     name: "Bread",

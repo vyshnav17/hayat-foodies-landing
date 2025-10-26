@@ -1,4 +1,5 @@
-# TODO for Adding Gradient to Hero Bread Image
+# TODO for Adding Baby Chocolate Bun Product
 
-- [x] Update the background overlay in `src/components/Hero.tsx` to use a gradient from 30% opacity at the top to 70% opacity at the bottom for better text visibility.
-- [x] Test the changes by running the development server and verifying the "Hayat Foods India" text is clearly visible.
+- [x] Add import for baby-chocolate-bun.jpg image in src/components/Products.tsx
+- [x] Add "Baby Chocolate Bun" product to the products array with description "Soft, rich, and perfectly sized for a satisfying chocolate treat." and image babyChocolateBunImg
+- [x] Test the changes by running the development server and verifying the new product appears in the products section
