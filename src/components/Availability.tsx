@@ -2,19 +2,19 @@ import { MapPin, Truck } from "lucide-react";
 
 const Availability = () => {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-16 md:py-20 bg-background">
       <div className="container px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12 animate-fade-in">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+          <div className="text-center mb-8 md:mb-12 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
               Where to Find Us
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base md:text-lg text-muted-foreground">
               Currently serving the entire Kannur district with fresh products daily
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             <div className="bg-card border border-border rounded-2xl p-8 hover:shadow-lg transition-all duration-300 animate-scale-in">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0">

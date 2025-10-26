@@ -2,10 +2,10 @@ import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-primary text-primary-foreground py-12">
+    <footer className="bg-primary text-primary-foreground py-8 md:py-12">
       <div className="container px-4">
-        <div className="text-center space-y-6">
-          <h3 className="text-2xl font-bold">Hayat Foods India PVT. LTD</h3>
+        <div className="text-center space-y-4 md:space-y-6">
+          <h3 className="text-xl md:text-2xl font-bold">Hayat Foods India PVT. LTD</h3>
           <p className="text-sm opacity-90">
             Premium Bakery Products | Kannur, Kerala, India
           </p>
@@ -21,7 +21,7 @@ const Footer = () => {
               <Facebook size={24} />
             </a>
             <a 
-              href="https://instagram.com" 
+              href="https://www.instagram.com/hayatfoodsindia/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="hover:opacity-80 transition-all duration-300 hover:scale-125 transform"

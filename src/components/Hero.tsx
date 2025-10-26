@@ -22,21 +22,21 @@ const Hero = () => {
       
       <div className="container relative z-10 px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center text-white">
-          <img 
-            src={logo} 
-            alt="Hayat Foods Logo" 
-            className="h-40 md:h-52 mx-auto mb-8 drop-shadow-2xl animate-fade-in animate-float"
+          <img
+            src={logo}
+            alt="Hayat Foods Logo"
+            className="h-32 md:h-40 lg:h-52 mx-auto mb-6 md:mb-8 drop-shadow-2xl animate-fade-in animate-float"
           />
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             Hayat Foods India
           </h1>
-          <p className="text-xl md:text-2xl mb-4 font-light animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
+          <p className="text-lg md:text-xl lg:text-2xl mb-3 md:mb-4 font-light animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
             Premium Bakery Products Since Establishment
           </p>
-          <p className="text-lg md:text-xl mb-8 text-white/90 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
+          <p className="text-base md:text-lg lg:text-xl mb-6 md:mb-8 text-white/90 animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
             Bringing Fresh, Quality Baked Goods to Kannur, Kerala
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
             <Button 
               size="lg" 
               onClick={scrollToProducts}
