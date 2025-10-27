@@ -4,10 +4,12 @@ import About from "@/components/About";
 import Availability from "@/components/Availability";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
 
 const Index = () => {
   return (
     <div className="min-h-screen">
+      <Navbar />
       <Hero />
       <Products />
       <About />

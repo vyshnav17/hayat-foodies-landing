@@ -9,7 +9,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+    <section id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -19,7 +19,7 @@ const Hero = () => {
           backgroundAttachment: 'fixed',
         }}
       />
-      
+
       <div className="container relative z-10 px-4 py-20 md:py-32">
         <div className="max-w-4xl mx-auto text-center text-white">
           <img
@@ -37,15 +37,15 @@ const Hero = () => {
             Bringing Fresh, Quality Baked Goods to Kannur, Kerala
           </p>
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               onClick={scrollToProducts}
               className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-110 transform"
             >
               Explore Our Products
             </Button>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               variant="outline"
               className="bg-white/10 hover:bg-white/20 text-white border-2 border-white/80 font-semibold text-lg px-8 py-6 rounded-full backdrop-blur-sm transition-all duration-500 hover:scale-110 transform"
               onClick={() => {

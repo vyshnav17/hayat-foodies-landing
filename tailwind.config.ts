@@ -60,6 +60,10 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Custom warm colors for Hayat Foods
+        terracotta: "#CD853F",
+        cream: "#FFFDD0",
+        brown: "#8B4513",
       },
       borderRadius: {
         lg: "var(--radius)",
