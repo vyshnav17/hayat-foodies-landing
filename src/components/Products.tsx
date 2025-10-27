@@ -11,7 +11,7 @@ import breadImg from "@/assets/bread.jpg";
 import ruskImg from "@/assets/rusk.jpg";
 import babyChocolateBunImg from "@/assets/baby-chocolate-bun.jpg";
 
-const products = [
+const defaultProducts = [
   {
     name: "Chapati",
     description: "Soft, fresh chapati made daily with premium ingredients",
@@ -69,9 +69,18 @@ const products = [
 ];
 
 const Products = () => {
-  const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
+  const [products, setProducts] = useState(defaultProducts);
+  const [selectedProduct, setSelectedProduct] = useState<typeof defaultProducts[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    // Load products from localStorage, fallback to defaultProducts
+    const storedProducts = JSON.parse(localStorage.getItem('products') || '[]');
+    if (storedProducts.length > 0) {
+      setProducts(storedProducts);
+    }
+  }, []);
 
   useEffect(() => {
     // Preload images for better performance
@@ -84,7 +93,7 @@ const Products = () => {
         img.src = image;
       });
     });
-  }, []);
+  }, [products]);
 
   return (
     <section id="products" className="py-16 md:py-20 bg-background">
