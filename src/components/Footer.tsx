@@ -13,29 +13,22 @@ const Footer = () => {
     <footer className="bg-primary text-primary-foreground py-8 md:py-12">
       <div className="container px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Instagram Feed Section */}
+          {/* Instagram Embed Section */}
           <div className="mb-8 md:mb-12">
             <h3 className="text-xl md:text-2xl font-bold text-center mb-6">Follow Us on Instagram</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {instagramPosts.map((post) => (
-                <a
-                  key={post.id}
-                  href="https://www.instagram.com/hayatfoodsindia/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative overflow-hidden rounded-lg aspect-square hover:scale-105 transition-transform duration-300"
-                >
-                  <img
-                    src={post.image}
-                    alt={post.alt}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <Instagram className="w-8 h-8 text-white" />
-                  </div>
-                </a>
-              ))}
+            <div className="flex justify-center">
+              <div className="w-full max-w-md h-96 bg-white rounded-lg overflow-hidden shadow-lg">
+                <iframe
+                  src="https://www.instagram.com/hayatfoodsindia/embed/"
+                  width="100%"
+                  height="100%"
+                  frameBorder="0"
+                  scrolling="no"
+                  allowTransparency={true}
+                  className="w-full h-full"
+                  title="Instagram Profile Embed"
+                ></iframe>
+              </div>
             </div>
           </div>
 
