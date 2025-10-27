@@ -127,7 +127,7 @@ const Contact = () => {
                     <Mail className="w-6 h-6" />
                   </div>
                   <h3 className="font-semibold mb-2">Email</h3>
-                  <p className="opacity-90">hayatfoodsindia@info.com</p>
+                  <p className="opacity-90">hayatfoodsindia<br></br>@info.com</p>
                 </div>
 
                 <div className="col-span-2 animate-scale-in" style={{ animationDelay: '0.2s' }}>
