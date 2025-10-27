@@ -39,7 +39,7 @@ const Contact = () => {
       // Log the submitted data to console (for development)
       console.log("Contact Form Submission:", data);
 
-      // Store in localStorage for persistence
+      // Store in localStorage for persistence (works on Vercel)
       const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
       const submissionWithTimestamp = {
         ...data,
@@ -63,6 +63,13 @@ const Contact = () => {
       // const formData = new FormData();
       // Object.entries(data).forEach(([key, value]) => formData.append(key, value));
       // await fetch('your-form-endpoint', { method: 'POST', body: formData });
+
+      // Option 4: Send to Vercel serverless function (if you have one)
+      // const response = await fetch('/api/contact', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(submissionWithTimestamp)
+      // });
 
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
