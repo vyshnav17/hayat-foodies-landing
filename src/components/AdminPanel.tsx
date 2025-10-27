@@ -8,6 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Trash2, Eye, Download, LogOut, CheckCircle, Plus, Edit, Save } from "lucide-react";
+import chapatiImg from "@/assets/chapati.jpg";
+import creamBunImg from "@/assets/cream-bun.jpg";
+import chocolateBunImg from "@/assets/chocolate-bun.jpg";
+import breadImg from "@/assets/bread.jpg";
+import ruskImg from "@/assets/rusk.jpg";
+import babyChocolateBunImg from "@/assets/baby-chocolate-bun.jpg";
 
 interface ContactSubmission {
   id: number;
@@ -53,6 +59,69 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     gst: ''
   });
 
+  const defaultProducts = [
+    {
+      id: 1,
+      name: "Chapati",
+      description: "Soft, fresh chapati made daily with premium ingredients",
+      images: [chapatiImg, breadImg, ruskImg],
+      ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
+      calories: 150,
+      price: 20,
+      gst: 2,
+    },
+    {
+      id: 2,
+      name: "Cream Bun",
+      description: "Delicious cream-filled buns with smooth vanilla cream",
+      images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
+      ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
+      calories: 250,
+      price: 30,
+      gst: 3,
+    },
+    {
+      id: 3,
+      name: "Normal Buns",
+      description: "Freshly baked, delightfully soft—your perfect companion for any meal",
+      images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
+      ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
+      calories: 200,
+      price: 25,
+      gst: 2.5,
+    },
+    {
+      id: 4,
+      name: "Baby Chocolate Bun",
+      description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
+      images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
+      ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
+      calories: 180,
+      price: 15,
+      gst: 1.5,
+    },
+    {
+      id: 5,
+      name: "Bread",
+      description: "Fresh, soft bread baked to perfection every day",
+      images: [breadImg, chapatiImg, ruskImg],
+      ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
+      calories: 120,
+      price: 40,
+      gst: 4,
+    },
+    {
+      id: 6,
+      name: "Rusk",
+      description: "Crispy, golden rusk perfect for tea time",
+      images: [ruskImg, breadImg, chapatiImg],
+      ingredients: ["Flour", "Sugar", "Butter", "Eggs", "Yeast"],
+      calories: 100,
+      price: 35,
+      gst: 3.5,
+    },
+  ];
+
   useEffect(() => {
     // Load submissions from localStorage
     const storedSubmissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
@@ -61,9 +130,15 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     setActiveSubmissions(active);
     setResolvedSubmissions(resolved);
 
-    // Load products from localStorage
+    // Load products from localStorage, fallback to defaultProducts
     const storedProducts = JSON.parse(localStorage.getItem('products') || '[]');
-    setProducts(storedProducts);
+    if (storedProducts.length > 0) {
+      setProducts(storedProducts);
+    } else {
+      // Initialize with default products if localStorage is empty
+      setProducts(defaultProducts);
+      localStorage.setItem('products', JSON.stringify(defaultProducts));
+    }
   }, []);
 
   const resolveSubmission = (id: number) => {

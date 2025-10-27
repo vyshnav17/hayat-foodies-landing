@@ -20,5 +20,5 @@
 - [ ] Test product editing and deletion functionality
 
 ## Followup
-- [ ] Commit changes to repository
+- [x] Commit changes to repository
 - [ ] Deploy and verify functionality in production
