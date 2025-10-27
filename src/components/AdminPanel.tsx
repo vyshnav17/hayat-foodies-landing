@@ -261,16 +261,16 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold">Contact Form Submissions</h1>
-          <div className="flex gap-2">
-            <Button onClick={exportToCSV} className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold">Contact Form Submissions</h1>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <Button onClick={exportToCSV} className="flex items-center justify-center gap-2 text-sm">
               <Download className="w-4 h-4" />
               Export CSV
             </Button>
-            <Button onClick={onLogout} variant="outline" className="flex items-center gap-2">
+            <Button onClick={onLogout} variant="outline" className="flex items-center justify-center gap-2 text-sm">
               <LogOut className="w-4 h-4" />
               Logout
             </Button>
@@ -278,25 +278,25 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         </div>
 
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="products">Products ({products.length})</TabsTrigger>
-            <TabsTrigger value="active">Active Queries ({activeSubmissions.length})</TabsTrigger>
-            <TabsTrigger value="resolved">Resolved Queries ({resolvedSubmissions.length})</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto p-1">
+            <TabsTrigger value="products" className="text-xs sm:text-sm py-2">Products ({products.length})</TabsTrigger>
+            <TabsTrigger value="active" className="text-xs sm:text-sm py-2">Active ({activeSubmissions.length})</TabsTrigger>
+            <TabsTrigger value="resolved" className="text-xs sm:text-sm py-2">Resolved ({resolvedSubmissions.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products" className="space-y-4">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Product Management</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h2 className="text-xl md:text-2xl font-bold">Product Management</h2>
               <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button onClick={() => setIsProductDialogOpen(true)} className="flex items-center gap-2">
+                  <Button onClick={() => setIsProductDialogOpen(true)} className="flex items-center gap-2 w-full sm:w-auto">
                     <Plus className="w-4 h-4" />
                     Add Product
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
-                    <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+                    <DialogTitle className="text-lg md:text-xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                   </DialogHeader>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -325,6 +325,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                         value={productForm.description}
                         onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
                         placeholder="Product description"
+                        className="min-h-[80px]"
                       />
                     </div>
                     <div>
@@ -368,11 +369,11 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                       />
                     </div>
                   </div>
-                  <div className="flex justify-end gap-2 mt-4">
-                    <Button variant="outline" onClick={() => setIsProductDialogOpen(false)}>
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                    <Button variant="outline" onClick={() => setIsProductDialogOpen(false)} className="w-full sm:w-auto">
                       Cancel
                     </Button>
-                    <Button onClick={handleProductSubmit} className="flex items-center gap-2">
+                    <Button onClick={handleProductSubmit} className="flex items-center justify-center gap-2 w-full sm:w-auto">
                       <Save className="w-4 h-4" />
                       {editingProduct ? 'Update' : 'Add'} Product
                     </Button>
@@ -381,7 +382,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
               </Dialog>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
               {/* Products List */}
               <div className="space-y-4">
                 <Card>
@@ -499,12 +500,12 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
           </TabsContent>
 
           <TabsContent value="active" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
               {/* Active Submissions List */}
               <div className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Active Submissions</CardTitle>
+                    <CardTitle className="text-lg md:text-xl">Active Submissions</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {activeSubmissions.length === 0 ? (
@@ -515,52 +516,54 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                       activeSubmissions.map((submission) => (
                         <div
                           key={submission.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-muted/50 cursor-pointer gap-2"
                           onClick={() => setSelectedSubmission(submission)}
                         >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold">{submission.name}</h3>
-                              <Badge variant="secondary">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                              <h3 className="font-semibold text-sm md:text-base truncate">{submission.name}</h3>
+                              <Badge variant="secondary" className="text-xs w-fit">
                                 {new Date(submission.timestamp).toLocaleDateString()}
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground">{submission.email}</p>
-                            <p className="text-sm text-muted-foreground truncate max-w-xs">
+                            <p className="text-xs md:text-sm text-muted-foreground truncate">{submission.email}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate max-w-full sm:max-w-xs">
                               {submission.message.substring(0, 50)}...
                             </p>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedSubmission(submission);
                               }}
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-green-600 hover:text-green-700"
+                              className="text-green-600 hover:text-green-700 h-8 w-8 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 resolveSubmission(submission.id);
                               }}
                             >
-                              <CheckCircle className="w-4 h-4" />
+                              <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 deleteSubmission(submission.id);
                               }}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                             </Button>
                           </div>
                         </div>
@@ -575,35 +578,35 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                 {selectedSubmission ? (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Submission Details</CardTitle>
+                      <CardTitle className="text-lg md:text-xl">Submission Details</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-3 md:space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Name</label>
-                        <p className="text-lg">{selectedSubmission.name}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.name}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Email</label>
-                        <p className="text-lg">{selectedSubmission.email}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.email}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Phone</label>
-                        <p className="text-lg">{selectedSubmission.phone}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.phone}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Message</label>
-                        <p className="text-lg whitespace-pre-wrap">{selectedSubmission.message}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Message</label>
+                        <p className="text-sm md:text-lg whitespace-pre-wrap break-words">{selectedSubmission.message}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Submitted At</label>
-                        <p className="text-lg">
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Submitted At</label>
+                        <p className="text-sm md:text-lg break-words">
                           {new Date(selectedSubmission.timestamp).toLocaleString()}
                         </p>
                       </div>
                       {selectedSubmission.resolved && (
                         <div>
-                          <label className="text-sm font-medium text-muted-foreground">Resolved At</label>
-                          <p className="text-lg">
+                          <label className="text-xs md:text-sm font-medium text-muted-foreground">Resolved At</label>
+                          <p className="text-sm md:text-lg break-words">
                             {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
                           </p>
                         </div>
@@ -612,8 +615,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                   </Card>
                 ) : (
                   <Card>
-                    <CardContent className="flex items-center justify-center h-64">
-                      <p className="text-muted-foreground">Select a submission to view details</p>
+                    <CardContent className="flex items-center justify-center h-48 md:h-64">
+                      <p className="text-muted-foreground text-center text-sm md:text-base">Select a submission to view details</p>
                     </CardContent>
                   </Card>
                 )}
@@ -622,12 +625,12 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
           </TabsContent>
 
           <TabsContent value="resolved" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
               {/* Resolved Submissions List */}
               <div className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Resolved Submissions</CardTitle>
+                    <CardTitle className="text-lg md:text-xl">Resolved Submissions</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {resolvedSubmissions.length === 0 ? (
@@ -638,41 +641,43 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                       resolvedSubmissions.map((submission) => (
                         <div
                           key={submission.id}
-                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer bg-green-50 border-green-200"
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-muted/50 cursor-pointer bg-green-50 border-green-200 gap-2"
                           onClick={() => setSelectedSubmission(submission)}
                         >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold">{submission.name}</h3>
-                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                              <h3 className="font-semibold text-sm md:text-base truncate">{submission.name}</h3>
+                              <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs w-fit">
                                 Resolved
                               </Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground">{submission.email}</p>
-                            <p className="text-sm text-muted-foreground truncate max-w-xs">
+                            <p className="text-xs md:text-sm text-muted-foreground truncate">{submission.email}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate max-w-full sm:max-w-xs">
                               {submission.message.substring(0, 50)}...
                             </p>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedSubmission(submission);
                               }}
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="sm"
+                              className="h-8 w-8 p-0"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 deleteSubmission(submission.id, true);
                               }}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
                             </Button>
                           </div>
                         </div>
@@ -687,35 +692,35 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                 {selectedSubmission ? (
                   <Card>
                     <CardHeader>
-                      <CardTitle>Submission Details</CardTitle>
+                      <CardTitle className="text-lg md:text-xl">Submission Details</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-3 md:space-y-4">
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Name</label>
-                        <p className="text-lg">{selectedSubmission.name}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.name}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Email</label>
-                        <p className="text-lg">{selectedSubmission.email}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.email}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Phone</label>
-                        <p className="text-lg">{selectedSubmission.phone}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.phone}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Message</label>
-                        <p className="text-lg whitespace-pre-wrap">{selectedSubmission.message}</p>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Message</label>
+                        <p className="text-sm md:text-lg whitespace-pre-wrap break-words">{selectedSubmission.message}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Submitted At</label>
-                        <p className="text-lg">
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Submitted At</label>
+                        <p className="text-sm md:text-lg break-words">
                           {new Date(selectedSubmission.timestamp).toLocaleString()}
                         </p>
                       </div>
                       {selectedSubmission.resolved && (
                         <div>
-                          <label className="text-sm font-medium text-muted-foreground">Resolved At</label>
-                          <p className="text-lg">
+                          <label className="text-xs md:text-sm font-medium text-muted-foreground">Resolved At</label>
+                          <p className="text-sm md:text-lg break-words">
                             {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
                           </p>
                         </div>
@@ -724,8 +729,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                   </Card>
                 ) : (
                   <Card>
-                    <CardContent className="flex items-center justify-center h-64">
-                      <p className="text-muted-foreground">Select a submission to view details</p>
+                    <CardContent className="flex items-center justify-center h-48 md:h-64">
+                      <p className="text-muted-foreground text-center text-sm md:text-base">Select a submission to view details</p>
                     </CardContent>
                   </Card>
                 )}
