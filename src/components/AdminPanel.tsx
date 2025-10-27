@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Eye, Download, LogOut } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trash2, Eye, Download, LogOut, CheckCircle } from "lucide-react";
 
 interface ContactSubmission {
   id: number;
@@ -11,6 +12,8 @@ interface ContactSubmission {
   phone: string;
   message: string;
   timestamp: string;
+  resolved?: boolean;
+  resolvedAt?: string;
 }
 
 interface AdminPanelProps {
@@ -18,31 +21,68 @@ interface AdminPanelProps {
 }
 
 const AdminPanel = ({ onLogout }: AdminPanelProps) => {
-  const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
+  const [activeSubmissions, setActiveSubmissions] = useState<ContactSubmission[]>([]);
+  const [resolvedSubmissions, setResolvedSubmissions] = useState<ContactSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
 
   useEffect(() => {
     // Load submissions from localStorage
     const storedSubmissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-    setSubmissions(storedSubmissions);
+    const active = storedSubmissions.filter((sub: ContactSubmission) => !sub.resolved);
+    const resolved = storedSubmissions.filter((sub: ContactSubmission) => sub.resolved);
+    setActiveSubmissions(active);
+    setResolvedSubmissions(resolved);
   }, []);
 
-  const deleteSubmission = (id: number) => {
-    const updatedSubmissions = submissions.filter(sub => sub.id !== id);
-    setSubmissions(updatedSubmissions);
-    localStorage.setItem('contactSubmissions', JSON.stringify(updatedSubmissions));
+  const resolveSubmission = (id: number) => {
+    const submission = activeSubmissions.find(sub => sub.id === id);
+    if (submission) {
+      const resolvedSubmission = {
+        ...submission,
+        resolved: true,
+        resolvedAt: new Date().toISOString()
+      };
+
+      const updatedActive = activeSubmissions.filter(sub => sub.id !== id);
+      const updatedResolved = [...resolvedSubmissions, resolvedSubmission];
+
+      setActiveSubmissions(updatedActive);
+      setResolvedSubmissions(updatedResolved);
+
+      // Update localStorage
+      const allSubmissions = [...updatedActive, ...updatedResolved];
+      localStorage.setItem('contactSubmissions', JSON.stringify(allSubmissions));
+    }
+  };
+
+  const deleteSubmission = (id: number, isResolved: boolean = false) => {
+    if (isResolved) {
+      const updatedResolved = resolvedSubmissions.filter(sub => sub.id !== id);
+      setResolvedSubmissions(updatedResolved);
+      // Keep in localStorage for customer database
+      const allSubmissions = [...activeSubmissions, ...updatedResolved];
+      localStorage.setItem('contactSubmissions', JSON.stringify(allSubmissions));
+    } else {
+      const updatedActive = activeSubmissions.filter(sub => sub.id !== id);
+      setActiveSubmissions(updatedActive);
+      const allSubmissions = [...updatedActive, ...resolvedSubmissions];
+      localStorage.setItem('contactSubmissions', JSON.stringify(allSubmissions));
+    }
   };
 
   const exportToCSV = () => {
+    const allSubmissions = [...activeSubmissions, ...resolvedSubmissions];
     const csvContent = [
-      ['ID', 'Name', 'Email', 'Phone', 'Message', 'Timestamp'],
-      ...submissions.map(sub => [
+      ['ID', 'Name', 'Email', 'Phone', 'Message', 'Timestamp', 'Status', 'Resolved At'],
+      ...allSubmissions.map(sub => [
         sub.id,
         sub.name,
         sub.email,
         sub.phone,
         `"${sub.message.replace(/"/g, '""')}"`, // Escape quotes in message
-        sub.timestamp
+        sub.timestamp,
+        sub.resolved ? 'Resolved' : 'Active',
+        sub.resolvedAt || ''
       ])
     ].map(row => row.join(',')).join('\n');
 
@@ -74,107 +114,247 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Submissions List */}
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>All Submissions ({submissions.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {submissions.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">
-                    No submissions yet
-                  </p>
-                ) : (
-                  submissions.map((submission) => (
-                    <div
-                      key={submission.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                      onClick={() => setSelectedSubmission(submission)}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{submission.name}</h3>
-                          <Badge variant="secondary">
-                            {new Date(submission.timestamp).toLocaleDateString()}
-                          </Badge>
+        <Tabs defaultValue="active" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="active">Active Queries ({activeSubmissions.length})</TabsTrigger>
+            <TabsTrigger value="resolved">Resolved Queries ({resolvedSubmissions.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="active" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Active Submissions List */}
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Active Submissions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {activeSubmissions.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">
+                        No active submissions
+                      </p>
+                    ) : (
+                      activeSubmissions.map((submission) => (
+                        <div
+                          key={submission.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                          onClick={() => setSelectedSubmission(submission)}
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">{submission.name}</h3>
+                              <Badge variant="secondary">
+                                {new Date(submission.timestamp).toLocaleDateString()}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{submission.email}</p>
+                            <p className="text-sm text-muted-foreground truncate max-w-xs">
+                              {submission.message.substring(0, 50)}...
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSubmission(submission);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-green-600 hover:text-green-700"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                resolveSubmission(submission.id);
+                              }}
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSubmission(submission.id);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">{submission.email}</p>
-                        <p className="text-sm text-muted-foreground truncate max-w-xs">
-                          {submission.message.substring(0, 50)}...
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Submission Details */}
+              <div>
+                {selectedSubmission ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Submission Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="text-lg">{selectedSubmission.name}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="text-lg">{selectedSubmission.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="text-lg">{selectedSubmission.phone}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Message</label>
+                        <p className="text-lg whitespace-pre-wrap">{selectedSubmission.message}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Submitted At</label>
+                        <p className="text-lg">
+                          {new Date(selectedSubmission.timestamp).toLocaleString()}
                         </p>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedSubmission(submission);
-                          }}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteSubmission(submission.id);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))
+                      {selectedSubmission.resolved && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Resolved At</label>
+                          <p className="text-lg">
+                            {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardContent className="flex items-center justify-center h-64">
+                      <p className="text-muted-foreground">Select a submission to view details</p>
+                    </CardContent>
+                  </Card>
                 )}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
+          </TabsContent>
 
-          {/* Submission Details */}
-          <div>
-            {selectedSubmission ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Submission Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Name</label>
-                    <p className="text-lg">{selectedSubmission.name}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Email</label>
-                    <p className="text-lg">{selectedSubmission.email}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Phone</label>
-                    <p className="text-lg">{selectedSubmission.phone}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Message</label>
-                    <p className="text-lg whitespace-pre-wrap">{selectedSubmission.message}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-muted-foreground">Submitted At</label>
-                    <p className="text-lg">
-                      {new Date(selectedSubmission.timestamp).toLocaleString()}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="flex items-center justify-center h-64">
-                  <p className="text-muted-foreground">Select a submission to view details</p>
-                </CardContent>
-              </Card>
-            )}
-          </div>
-        </div>
+          <TabsContent value="resolved" className="space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Resolved Submissions List */}
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Resolved Submissions</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {resolvedSubmissions.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">
+                        No resolved submissions
+                      </p>
+                    ) : (
+                      resolvedSubmissions.map((submission) => (
+                        <div
+                          key={submission.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer bg-green-50 border-green-200"
+                          onClick={() => setSelectedSubmission(submission)}
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold">{submission.name}</h3>
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                Resolved
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{submission.email}</p>
+                            <p className="text-sm text-muted-foreground truncate max-w-xs">
+                              {submission.message.substring(0, 50)}...
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSubmission(submission);
+                              }}
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSubmission(submission.id, true);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Submission Details */}
+              <div>
+                {selectedSubmission ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Submission Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="text-lg">{selectedSubmission.name}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="text-lg">{selectedSubmission.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="text-lg">{selectedSubmission.phone}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Message</label>
+                        <p className="text-lg whitespace-pre-wrap">{selectedSubmission.message}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Submitted At</label>
+                        <p className="text-lg">
+                          {new Date(selectedSubmission.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                      {selectedSubmission.resolved && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Resolved At</label>
+                          <p className="text-lg">
+                            {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardContent className="flex items-center justify-center h-64">
+                      <p className="text-muted-foreground">Select a submission to view details</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
