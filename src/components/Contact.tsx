@@ -108,7 +108,7 @@ const Contact = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
             {/* Contact Info */}
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="animate-scale-in">
                   <div className="inline-flex items-center justify-center w-12 md:w-14 h-12 md:h-14 rounded-full bg-primary-foreground/10 mb-4">
                     <Phone className="w-5 md:w-6 h-5 md:h-6" />
@@ -127,10 +127,10 @@ const Contact = () => {
                     <Mail className="w-6 h-6" />
                   </div>
                   <h3 className="font-semibold mb-2">Email</h3>
-                  <p className="opacity-90">Send us your questions</p>
+                  <p className="opacity-90">hayatfoodsindia@info.com</p>
                 </div>
 
-                <div className="col-span-1 md:col-span-2 animate-scale-in" style={{ animationDelay: '0.2s' }}>
+                <div className="col-span-2 animate-scale-in" style={{ animationDelay: '0.2s' }}>
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 mb-4">
                     <MapPin className="w-6 h-6" />
                   </div>
