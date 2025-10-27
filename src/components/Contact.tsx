@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import whatsAppLogo from "@/assets/WhatsApp.png";
 
 const contactSchema = z.object({
@@ -22,6 +23,7 @@ type ContactForm = z.infer<typeof contactSchema>;
 const Contact = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const form = useForm<ContactForm>({
     resolver: zodResolver(contactSchema),
@@ -116,9 +118,19 @@ const Contact = () => {
                   <h3 className="font-semibold mb-2">Phone</h3>
                   <p className="opacity-90 text-sm md:text-base">Contact us for inquiries</p>
                   <div className="opacity-90 text-sm md:text-base space-y-1">
-                    <p>+91 9988636383</p>
-                    <p>+91 8592056057</p>
-                    <p>+91 81119 28999</p>
+                    {isMobile ? (
+                      <>
+                        <a href="tel:+919988636383" className="hover:underline">+91 9988636383</a>
+                        <a href="tel:+918592056057" className="hover:underline">+91 8592056057</a>
+                        <a href="tel:+918111928999" className="hover:underline">+91 81119 28999</a>
+                      </>
+                    ) : (
+                      <>
+                        <p>+91 9988636383</p>
+                        <p>+91 8592056057</p>
+                        <p>+91 81119 28999</p>
+                      </>
+                    )}
                   </div>
                 </div>
 

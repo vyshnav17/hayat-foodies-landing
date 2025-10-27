@@ -18,10 +18,12 @@ import {
 } from "lucide-react";
 import logo from "@/assets/logo.png";
 import whatsappIcon from "@/assets/icons8-whatsapp-24.png";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -201,7 +203,11 @@ const Navbar = () => {
                   <div className="border-t border-cream/30 pt-6 space-y-4">
                     <div className="flex items-center space-x-3 group">
                       <Phone className="h-4 w-4 text-terracotta transition-transform duration-300 ease-in-out group-hover:scale-110" />
-                      <span className="text-sm transition-colors duration-300 ease-in-out">+91 99952 36569</span>
+                      {isMobile ? (
+                        <a href="tel:+919995236569" className="text-sm hover:underline transition-colors duration-300 ease-in-out">+91 99952 36569</a>
+                      ) : (
+                        <span className="text-sm transition-colors duration-300 ease-in-out">+91 99952 36569</span>
+                      )}
                     </div>
                     <div className="flex items-center space-x-3 group">
                       <Mail className="h-4 w-4 text-terracotta transition-transform duration-300 ease-in-out group-hover:scale-110" />
