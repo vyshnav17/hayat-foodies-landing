@@ -132,7 +132,7 @@ const Products = () => {
 
                   </div>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-6 p-2 md:p-4">
                   <h3 className="text-xl md:text-2xl font-bold">{selectedProduct.name}</h3>
                   <p className="text-muted-foreground text-sm md:text-base">{selectedProduct.description}</p>
                   <div>
