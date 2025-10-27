@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Skeleton } from "@/components/ui/skeleton";
 import Autoplay from "embla-carousel-autoplay";
 import chapatiImg from "@/assets/chapati.jpg";
 import creamBunImg from "@/assets/cream-bun.jpg";
@@ -70,6 +71,20 @@ const products = [
 const Products = () => {
   const [selectedProduct, setSelectedProduct] = useState<typeof products[0] | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    // Preload images for better performance
+    products.forEach(product => {
+      product.images.forEach(image => {
+        const img = new Image();
+        img.onload = () => {
+          setImagesLoaded(prev => ({ ...prev, [image]: true }));
+        };
+        img.src = image;
+      });
+    });
+  }, []);
 
   return (
     <section id="products" className="py-16 md:py-20 bg-background">
