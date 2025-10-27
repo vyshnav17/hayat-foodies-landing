@@ -7,3 +7,4 @@
 - [x] Create DialogContent with grid layout: left side carousel of images, right side product details
 - [x] Display description, ingredients, calories, and final price (price + gst) in the right side
 - [x] Test the popup functionality (dev server running at http://localhost:8080/)
+- [x] Commit changes

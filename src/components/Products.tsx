@@ -111,9 +111,9 @@ const Products = () => {
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="max-w-4xl w-full mx-4 rounded-xl p-4 md:p-6">
             {selectedProduct && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-4">
                   <div className="relative">
                     <Carousel className="w-full" plugins={[Autoplay({ delay: 2000 })]}>
@@ -123,7 +123,7 @@ const Products = () => {
                             <img
                               src={image}
                               alt={`${selectedProduct.name} ${imgIndex + 1}`}
-                              className="w-full h-64 object-cover rounded-lg"
+                              className="w-full h-48 md:h-64 object-cover rounded-lg"
                             />
                           </CarouselItem>
                         ))}
@@ -133,21 +133,21 @@ const Products = () => {
                   </div>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-bold">{selectedProduct.name}</h3>
-                  <p className="text-muted-foreground">{selectedProduct.description}</p>
+                  <h3 className="text-xl md:text-2xl font-bold">{selectedProduct.name}</h3>
+                  <p className="text-muted-foreground text-sm md:text-base">{selectedProduct.description}</p>
                   <div>
-                    <h4 className="font-semibold">Ingredients:</h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground">
+                    <h4 className="font-semibold text-sm md:text-base">Ingredients:</h4>
+                    <ul className="list-disc list-inside text-xs md:text-sm text-muted-foreground">
                       {selectedProduct.ingredients.map((ingredient, idx) => (
                         <li key={idx}>{ingredient}</li>
                       ))}
                     </ul>
                   </div>
                   <div>
-                    <p className="text-sm"><strong>Calories:</strong> {selectedProduct.calories} kcal</p>
+                    <p className="text-xs md:text-sm"><strong>Calories:</strong> {selectedProduct.calories} kcal</p>
                   </div>
                   <div>
-                    <p className="text-lg font-bold">Price: ₹{selectedProduct.price + selectedProduct.gst} (including GST)</p>
+                    <p className="text-base md:text-lg font-bold">Price: ₹{selectedProduct.price + selectedProduct.gst} (including GST)</p>
                   </div>
                 </div>
               </div>
