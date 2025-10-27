@@ -25,7 +25,7 @@ const Hero = () => {
           <img
             src={logo}
             alt="Hayat Foods Logo"
-            className="h-32 md:h-40 lg:h-52 mx-auto mb-6 md:mb-8 drop-shadow-2xl animate-fade-in animate-float"
+            className="h-36 md:h-44 lg:h-56 mx-auto mb-6 md:mb-8 drop-shadow-2xl animate-fade-in animate-float"
           />
           <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             Hayat Foods India
