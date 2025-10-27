@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Eye, Download } from "lucide-react";
+import { Trash2, Eye, Download, LogOut } from "lucide-react";
 
 interface ContactSubmission {
   id: number;
@@ -13,7 +13,11 @@ interface ContactSubmission {
   timestamp: string;
 }
 
-const AdminPanel = () => {
+interface AdminPanelProps {
+  onLogout: () => void;
+}
+
+const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   const [submissions, setSubmissions] = useState<ContactSubmission[]>([]);
   const [selectedSubmission, setSelectedSubmission] = useState<ContactSubmission | null>(null);
 
@@ -58,10 +62,16 @@ const AdminPanel = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold">Contact Form Submissions</h1>
-          <Button onClick={exportToCSV} className="flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export CSV
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={exportToCSV} className="flex items-center gap-2">
+              <Download className="w-4 h-4" />
+              Export CSV
+            </Button>
+            <Button onClick={onLogout} variant="outline" className="flex items-center gap-2">
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
