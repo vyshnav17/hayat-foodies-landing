@@ -111,7 +111,7 @@ const Products = () => {
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-4xl w-full mx-6 rounded-xl p-6 md:p-8">
+          <DialogContent className="max-w-4xl w-full mx-0 rounded-xl p-6 md:p-8">
             {selectedProduct && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <div className="space-y-6">
