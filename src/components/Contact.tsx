@@ -210,7 +210,7 @@ const Contact = () => {
                           <FormControl>
                             <Textarea
                               placeholder="Tell us about your inquiry..."
-                              className="min-h-[100px]"
+                              className="min-h-[100px] resize-none"
                               {...field}
                             />
                           </FormControl>
