@@ -36,7 +36,35 @@ const Contact = () => {
   const onSubmit = async (data: ContactForm) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
+      // Log the submitted data to console (for development)
+      console.log("Contact Form Submission:", data);
+
+      // Store in localStorage for persistence
+      const submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+      const submissionWithTimestamp = {
+        ...data,
+        timestamp: new Date().toISOString(),
+        id: Date.now()
+      };
+      submissions.push(submissionWithTimestamp);
+      localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+
+      // Option 1: Send to a backend API (replace with your actual API endpoint)
+      // const response = await fetch('/api/contact', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(data)
+      // });
+
+      // Option 2: Send email using EmailJS (install emailjs-com first)
+      // await emailjs.send('your_service_id', 'your_template_id', data, 'your_user_id');
+
+      // Option 3: Send to Google Forms or other form services
+      // const formData = new FormData();
+      // Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+      // await fetch('your-form-endpoint', { method: 'POST', body: formData });
+
+      // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       toast({
@@ -46,6 +74,7 @@ const Contact = () => {
 
       form.reset();
     } catch (error) {
+      console.error("Form submission error:", error);
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
