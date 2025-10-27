@@ -60,7 +60,7 @@ const Navbar = () => {
                 src={logo}
                 alt="Hayat Foods Logo"
                 className={`w-auto transition-all duration-500 ease-in-out ${
-                  isScrolled ? 'h-10 md:h-12' : 'h-14 md:h-16'
+                  isScrolled ? 'h-8 md:h-10' : 'h-12 md:h-14'
                 } hover:scale-105 transform`}
               />
             </Link>
