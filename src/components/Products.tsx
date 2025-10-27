@@ -111,10 +111,10 @@ const Products = () => {
         </div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-4xl w-full mx-4 rounded-xl p-4 md:p-6">
+          <DialogContent className="max-w-4xl w-full mx-4 rounded-xl p-6 md:p-8">
             {selectedProduct && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                <div className="space-y-6">
                   <div className="relative">
                     <Carousel className="w-full" plugins={[Autoplay({ delay: 2000 })]}>
                       <CarouselContent>
@@ -132,12 +132,12 @@ const Products = () => {
 
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <h3 className="text-xl md:text-2xl font-bold">{selectedProduct.name}</h3>
                   <p className="text-muted-foreground text-sm md:text-base">{selectedProduct.description}</p>
                   <div>
                     <h4 className="font-semibold text-sm md:text-base">Ingredients:</h4>
-                    <ul className="list-disc list-inside text-xs md:text-sm text-muted-foreground">
+                    <ul className="list-disc list-inside text-xs md:text-sm text-muted-foreground mt-2">
                       {selectedProduct.ingredients.map((ingredient, idx) => (
                         <li key={idx}>{ingredient}</li>
                       ))}
