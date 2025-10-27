@@ -120,14 +120,14 @@ const Contact = () => {
                   <div className="opacity-90 text-sm md:text-base space-y-1">
                     {isMobile ? (
                       <>
-                        <a href="tel:+919988636383" className="hover:underline">+91 9988636383</a>
-                        <a href="tel:+918592056057" className="hover:underline">+91 8592056057</a>
+                        <a href="tel:+919988636383" className="hover:underline">+91 9988636383</a><br></br>
+                        <a href="tel:+918592056057" className="hover:underline">+91 8592056057</a><br></br>
                         <a href="tel:+918111928999" className="hover:underline">+91 81119 28999</a>
                       </>
                     ) : (
                       <>
-                        <p>+91 9988636383</p>
-                        <p>+91 8592056057</p>
+                        <p>+91 9988636383</p><br></br>
+                        <p>+91 8592056057</p><br></br>
                         <p>+91 81119 28999</p>
                       </>
                     )}
