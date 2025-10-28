@@ -30,7 +30,7 @@ interface Product {
   id: string;
   name: string;
   description: string;
-  images: string[]; // base64 encoded images
+  images: string[]; // image URLs
   ingredients: string[];
   calories: number;
   price: number;
@@ -52,7 +52,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   const [productForm, setProductForm] = useState({
     name: '',
     description: '',
-    images: [] as File[],
+    images: '',
     ingredients: '',
     calories: '',
     price: '',
@@ -288,36 +288,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     }
 
     try {
-      let imageUrls: string[] = [];
-
-      if (productForm.images.length > 0) {
-        // Validate files before processing
-        for (const file of productForm.images) {
-          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-          if (!allowedTypes.includes(file.type)) {
-            alert(`File "${file.name}" is not a supported image format. Please select JPG, PNG, GIF, or WebP files only.`);
-            return;
-          }
-          if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            alert(`File "${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(2)}MB). Maximum size is 5MB.`);
-            return;
-          }
-        }
-
-        const imagePromises = productForm.images.map(file => {
-          return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = (e) => {
-              console.error('FileReader error for file:', file.name, e);
-              reject(new Error(`Unable to process the image file "${file.name}". Please ensure the file is a valid JPG/PNG/GIF image, not corrupted, and try again.`));
-            };
-            reader.readAsDataURL(file);
-          });
-        });
-
-        imageUrls = await Promise.all(imagePromises);
-      }
+      const imageUrls = productForm.images.split(',').map(url => url.trim()).filter(url => url);
 
       const productData = {
         name: productForm.name.trim(),
@@ -362,7 +333,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         setProductForm({
           name: '',
           description: '',
-          images: [],
+          images: '',
           ingredients: '',
           calories: '',
           price: '',
@@ -388,7 +359,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     setProductForm({
       name: product.name,
       description: product.description,
-      images: [],
+      images: product.images.join(', '),
       ingredients: product.ingredients.join(', '),
       calories: product.calories.toString(),
       price: product.price.toString(),
@@ -694,23 +665,13 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <Label htmlFor="images">Images</Label>
+                      <Label htmlFor="images">Images (comma-separated URLs)</Label>
                       <Input
                         id="images"
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={(e) => {
-                          const files = Array.from(e.target.files || []);
-                          setProductForm({ ...productForm, images: files });
-                        }}
-                        placeholder="Select images"
+                        value={productForm.images}
+                        onChange={(e) => setProductForm({ ...productForm, images: e.target.value })}
+                        placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
                       />
-                      {productForm.images.length > 0 && (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {productForm.images.length} file(s) selected
-                        </p>
-                      )}
                     </div>
                     <div className="md:col-span-2">
                       <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
