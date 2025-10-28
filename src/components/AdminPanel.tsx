@@ -27,7 +27,7 @@ interface ContactSubmission {
 }
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   description: string;
   images: string[]; // base64 encoded images
@@ -61,7 +61,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
 
   const defaultProducts = [
     {
-      id: 1,
+      id: "1",
       name: "Chapati",
       description: "Soft, fresh chapati made daily with premium ingredients",
       images: [chapatiImg, breadImg, ruskImg],
@@ -71,7 +71,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       gst: 2,
     },
     {
-      id: 2,
+      id: "2",
       name: "Cream Bun",
       description: "Delicious cream-filled buns with smooth vanilla cream",
       images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
@@ -81,7 +81,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       gst: 3,
     },
     {
-      id: 3,
+      id: "3",
       name: "Normal Buns",
       description: "Freshly baked, delightfully soft—your perfect companion for any meal",
       images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
@@ -91,7 +91,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       gst: 2.5,
     },
     {
-      id: 4,
+      id: "4",
       name: "Baby Chocolate Bun",
       description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
       images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
@@ -101,7 +101,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       gst: 1.5,
     },
     {
-      id: 5,
+      id: "5",
       name: "Bread",
       description: "Fresh, soft bread baked to perfection every day",
       images: [breadImg, chapatiImg, ruskImg],
@@ -111,7 +111,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       gst: 4,
     },
     {
-      id: 6,
+      id: "6",
       name: "Rusk",
       description: "Crispy, golden rusk perfect for tea time",
       images: [ruskImg, breadImg, chapatiImg],
@@ -397,7 +397,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     setIsProductDialogOpen(true);
   };
 
-  const deleteProduct = async (id: number) => {
+  const deleteProduct = async (id: string) => {
     try {
       const response = await fetch(`/api/products?id=${id}`, {
         method: 'DELETE'
