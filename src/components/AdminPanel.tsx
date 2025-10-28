@@ -492,7 +492,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                     Add Product
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-2xl w-[95vw] max-h-[90vh] overflow-y-auto p-4 md:p-6">
                   <DialogHeader>
                     <DialogTitle className="text-lg md:text-xl">{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                   </DialogHeader>
