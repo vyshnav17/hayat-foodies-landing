@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { MongoClient } from 'mongodb';
+import admin from 'firebase-admin';
 import cors from 'cors';
 
 const corsHandler = cors({
@@ -7,31 +7,17 @@ const corsHandler = cors({
   credentials: true
 });
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = 'tc';
-const COLLECTION_NAME = 'contact-submissions';
-
-let cachedClient = null;
-let cachedDb = null;
-
-async function connectToDatabase() {
-  if (cachedClient && cachedDb) {
-    return { client: cachedClient, db: cachedDb };
-  }
-
-  if (!MONGODB_URI) {
-    throw new Error('MONGODB_URI environment variable is not set');
-  }
-
-  const client = new MongoClient(MONGODB_URI);
-  await client.connect();
-  const db = client.db(DB_NAME);
-
-  cachedClient = client;
-  cachedDb = db;
-
-  return { client, db };
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    databaseURL: process.env.FIREBASE_DATABASE_URL
+  });
 }
+
+const db = admin.firestore();
+const COLLECTION_NAME = 'contact-submissions';
 
 function wrapCors(handler) {
   return (req, res) => {
@@ -46,26 +32,26 @@ function wrapCors(handler) {
 
 async function handler(req, res) {
   try {
-    const { db } = await connectToDatabase();
-    const collection = db.collection(COLLECTION_NAME);
-
     switch (req.method) {
       case 'GET':
-        const submissions = await collection.find({}).sort({ timestamp: -1 }).toArray();
+        const submissionsSnapshot = await db.collection(COLLECTION_NAME).orderBy('timestamp', 'desc').get();
+        const submissions = submissionsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
         res.status(200).json(submissions);
         break;
 
       case 'POST':
         const newSubmission = {
           ...req.body,
-          id: Date.now(),
           timestamp: new Date().toISOString(),
           resolved: false,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
-        const result = await collection.insertOne(newSubmission);
-        res.status(201).json({ ...newSubmission, _id: result.insertedId });
+        const docRef = await db.collection(COLLECTION_NAME).add(newSubmission);
+        res.status(201).json({ id: docRef.id, ...newSubmission });
         break;
 
       case 'PUT':
@@ -73,18 +59,11 @@ async function handler(req, res) {
         if (!id) {
           return res.status(400).json({ error: 'Submission ID is required' });
         }
-        const updateResult = await collection.updateOne(
-          { id: parseInt(id) },
-          {
-            $set: {
-              ...updateData,
-              updatedAt: new Date().toISOString()
-            }
-          }
-        );
-        if (updateResult.matchedCount === 0) {
-          return res.status(404).json({ error: 'Submission not found' });
-        }
+        const updateDataWithTimestamp = {
+          ...updateData,
+          updatedAt: new Date().toISOString()
+        };
+        await db.collection(COLLECTION_NAME).doc(id).update(updateDataWithTimestamp);
         res.status(200).json({ message: 'Submission updated successfully' });
         break;
 
@@ -93,10 +72,7 @@ async function handler(req, res) {
         if (!deleteId) {
           return res.status(400).json({ error: 'Submission ID is required' });
         }
-        const deleteResult = await collection.deleteOne({ id: parseInt(deleteId) });
-        if (deleteResult.deletedCount === 0) {
-          return res.status(404).json({ error: 'Submission not found' });
-        }
+        await db.collection(COLLECTION_NAME).doc(deleteId).delete();
         res.status(200).json({ message: 'Submission deleted successfully' });
         break;
 
