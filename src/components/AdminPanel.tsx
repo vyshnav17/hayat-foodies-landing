@@ -319,8 +319,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         imageUrls = await Promise.all(imagePromises);
       }
 
-      const newProduct: Product = {
-        id: editingProduct ? editingProduct.id : Date.now(),
+      const productData = {
         name: productForm.name.trim(),
         description: productForm.description.trim(),
         images: imageUrls,
@@ -330,65 +329,57 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         gst: parseFloat(productForm.gst)
       };
 
-      let updatedProducts;
-      if (editingProduct) {
-        updatedProducts = products.map(p => p.id === editingProduct.id ? newProduct : p);
-      } else {
-        updatedProducts = [...products, newProduct];
-      }
+      let response;
+      let successMessage;
 
       if (editingProduct) {
-        // Update existing product
-        const response = await fetch('/api/products', {
+        // Update existing product - include the id for update
+        const updateData = { ...productData, id: editingProduct.id };
+        response = await fetch('/api/products', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct)
+          body: JSON.stringify(updateData)
         });
-
-        if (response.ok) {
-          const updatedProducts = products.map(p => p.id === editingProduct.id ? newProduct : p);
-          setProducts(updatedProducts);
-        } else {
-          console.error('Failed to update product');
-          alert('Failed to update product');
-          return;
-        }
+        successMessage = 'Product updated successfully!';
       } else {
         // Add new product
-        const response = await fetch('/api/products', {
+        response = await fetch('/api/products', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newProduct)
+          body: JSON.stringify(productData)
         });
-
-        if (response.ok) {
-          const addedProduct = await response.json();
-          const updatedProducts = [...products, addedProduct];
-          setProducts(updatedProducts);
-        } else {
-          console.error('Failed to add product');
-          alert('Failed to add product');
-          return;
-        }
+        successMessage = 'Product added successfully!';
       }
 
-      // Reset form
-      setProductForm({
-        name: '',
-        description: '',
-        images: [],
-        ingredients: '',
-        calories: '',
-        price: '',
-        gst: ''
-      });
-      setEditingProduct(null);
-      setIsProductDialogOpen(false);
+      if (response.ok) {
+        const result = await response.json();
+        console.log('API Response:', result);
 
-      alert('Product added successfully!');
+        // Refresh products from API
+        await fetchProducts();
+
+        // Reset form
+        setProductForm({
+          name: '',
+          description: '',
+          images: [],
+          ingredients: '',
+          calories: '',
+          price: '',
+          gst: ''
+        });
+        setEditingProduct(null);
+        setIsProductDialogOpen(false);
+
+        alert(successMessage);
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('API Error:', errorData);
+        alert(`Failed to ${editingProduct ? 'update' : 'add'} product: ${errorData.error || 'Unknown error'}`);
+      }
     } catch (error) {
-      console.error('Error adding product:', error);
-      alert(`Failed to add product: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.error('Error submitting product:', error);
+      alert(`Failed to ${editingProduct ? 'update' : 'add'} product: ${error instanceof Error ? error.message : 'Network error'}`);
     }
   };
 
