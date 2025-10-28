@@ -232,16 +232,23 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     }
 
     try {
-      const imagePromises = productForm.images.map(file => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      });
+      let imageUrls: string[] = [];
 
-      const imageUrls = await Promise.all(imagePromises);
+      if (productForm.images.length > 0) {
+        const imagePromises = productForm.images.map(file => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (e) => {
+              console.error('FileReader error:', e);
+              reject(new Error(`Failed to read file: ${file.name}`));
+            };
+            reader.readAsDataURL(file);
+          });
+        });
+
+        imageUrls = await Promise.all(imagePromises);
+      }
 
       const newProduct: Product = {
         id: editingProduct ? editingProduct.id : Date.now(),
@@ -276,9 +283,11 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       });
       setEditingProduct(null);
       setIsProductDialogOpen(false);
+
+      alert('Product added successfully!');
     } catch (error) {
       console.error('Error adding product:', error);
-      alert('Failed to add product. Please try again.');
+      alert(`Failed to add product: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
