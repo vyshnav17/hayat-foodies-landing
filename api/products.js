@@ -1,5 +1,6 @@
-const { MongoClient } = require('mongodb');
-const cors = require('cors');
+import 'dotenv/config';
+import { MongoClient } from 'mongodb';
+import cors from 'cors';
 
 const corsHandler = cors({
   origin: true,
@@ -7,7 +8,7 @@ const corsHandler = cors({
 });
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const DB_NAME = 'hayat-foodies';
+const DB_NAME = 'tc';
 const COLLECTION_NAME = 'products';
 
 let cachedClient = null;
@@ -107,4 +108,4 @@ async function handler(req, res) {
   }
 }
 
-module.exports = wrapCors(handler);
+export default wrapCors(handler);
