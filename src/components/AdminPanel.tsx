@@ -205,50 +205,81 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   };
 
   const handleProductSubmit = async () => {
-    const imagePromises = productForm.images.map(file => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    });
-
-    const imageUrls = await Promise.all(imagePromises);
-
-    const newProduct: Product = {
-      id: editingProduct ? editingProduct.id : Date.now(),
-      name: productForm.name,
-      description: productForm.description,
-      images: imageUrls,
-      ingredients: productForm.ingredients.split(',').map(ing => ing.trim()),
-      calories: parseInt(productForm.calories),
-      price: parseFloat(productForm.price),
-      gst: parseFloat(productForm.gst)
-    };
-
-    let updatedProducts;
-    if (editingProduct) {
-      updatedProducts = products.map(p => p.id === editingProduct.id ? newProduct : p);
-    } else {
-      updatedProducts = [...products, newProduct];
+    // Form validation
+    if (!productForm.name.trim()) {
+      alert('Product name is required');
+      return;
+    }
+    if (!productForm.description.trim()) {
+      alert('Product description is required');
+      return;
+    }
+    if (!productForm.price.trim() || isNaN(parseFloat(productForm.price))) {
+      alert('Valid price is required');
+      return;
+    }
+    if (!productForm.gst.trim() || isNaN(parseFloat(productForm.gst))) {
+      alert('Valid GST percentage is required');
+      return;
+    }
+    if (!productForm.calories.trim() || isNaN(parseInt(productForm.calories))) {
+      alert('Valid calories is required');
+      return;
+    }
+    if (!productForm.ingredients.trim()) {
+      alert('Ingredients are required');
+      return;
     }
 
-    setProducts(updatedProducts);
-    localStorage.setItem('products', JSON.stringify(updatedProducts));
+    try {
+      const imagePromises = productForm.images.map(file => {
+        return new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
 
-    // Reset form
-    setProductForm({
-      name: '',
-      description: '',
-      images: [],
-      ingredients: '',
-      calories: '',
-      price: '',
-      gst: ''
-    });
-    setEditingProduct(null);
-    setIsProductDialogOpen(false);
+      const imageUrls = await Promise.all(imagePromises);
+
+      const newProduct: Product = {
+        id: editingProduct ? editingProduct.id : Date.now(),
+        name: productForm.name.trim(),
+        description: productForm.description.trim(),
+        images: imageUrls,
+        ingredients: productForm.ingredients.split(',').map(ing => ing.trim()).filter(ing => ing),
+        calories: parseInt(productForm.calories),
+        price: parseFloat(productForm.price),
+        gst: parseFloat(productForm.gst)
+      };
+
+      let updatedProducts;
+      if (editingProduct) {
+        updatedProducts = products.map(p => p.id === editingProduct.id ? newProduct : p);
+      } else {
+        updatedProducts = [...products, newProduct];
+      }
+
+      setProducts(updatedProducts);
+      localStorage.setItem('products', JSON.stringify(updatedProducts));
+
+      // Reset form
+      setProductForm({
+        name: '',
+        description: '',
+        images: [],
+        ingredients: '',
+        calories: '',
+        price: '',
+        gst: ''
+      });
+      setEditingProduct(null);
+      setIsProductDialogOpen(false);
+    } catch (error) {
+      console.error('Error adding product:', error);
+      alert('Failed to add product. Please try again.');
+    }
   };
 
   const editProduct = (product: Product) => {
