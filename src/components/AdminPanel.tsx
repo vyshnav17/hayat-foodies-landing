@@ -123,57 +123,113 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   ];
 
   useEffect(() => {
-    // Load submissions from localStorage
-    const storedSubmissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
-    const active = storedSubmissions.filter((sub: ContactSubmission) => !sub.resolved);
-    const resolved = storedSubmissions.filter((sub: ContactSubmission) => sub.resolved);
-    setActiveSubmissions(active);
-    setResolvedSubmissions(resolved);
+    // Load submissions from API
+    fetchContactSubmissions();
 
-    // Load products from localStorage, fallback to defaultProducts
-    const storedProducts = JSON.parse(localStorage.getItem('products') || '[]');
-    if (storedProducts.length > 0) {
-      setProducts(storedProducts);
-    } else {
-      // Initialize with default products if localStorage is empty
-      setProducts(defaultProducts);
-      localStorage.setItem('products', JSON.stringify(defaultProducts));
-    }
+    // Load products from API, fallback to defaultProducts
+    fetchProducts();
   }, []);
 
-  const resolveSubmission = (id: number) => {
-    const submission = activeSubmissions.find(sub => sub.id === id);
-    if (submission) {
-      const resolvedSubmission = {
-        ...submission,
-        resolved: true,
-        resolvedAt: new Date().toISOString()
-      };
-
-      const updatedActive = activeSubmissions.filter(sub => sub.id !== id);
-      const updatedResolved = [...resolvedSubmissions, resolvedSubmission];
-
-      setActiveSubmissions(updatedActive);
-      setResolvedSubmissions(updatedResolved);
-
-      // Update localStorage
-      const allSubmissions = [...updatedActive, ...updatedResolved];
-      localStorage.setItem('contactSubmissions', JSON.stringify(allSubmissions));
+  const fetchContactSubmissions = async () => {
+    try {
+      const response = await fetch('/api/contact');
+      if (response.ok) {
+        const submissions = await response.json();
+        const active = submissions.filter((sub: ContactSubmission) => !sub.resolved);
+        const resolved = submissions.filter((sub: ContactSubmission) => sub.resolved);
+        setActiveSubmissions(active);
+        setResolvedSubmissions(resolved);
+      } else {
+        console.error('Failed to fetch contact submissions');
+      }
+    } catch (error) {
+      console.error('Error fetching contact submissions:', error);
     }
   };
 
-  const deleteSubmission = (id: number, isResolved: boolean = false) => {
-    if (isResolved) {
-      const updatedResolved = resolvedSubmissions.filter(sub => sub.id !== id);
-      setResolvedSubmissions(updatedResolved);
-      // Keep in localStorage for customer database
-      const allSubmissions = [...activeSubmissions, ...updatedResolved];
-      localStorage.setItem('contactSubmissions', JSON.stringify(allSubmissions));
-    } else {
-      const updatedActive = activeSubmissions.filter(sub => sub.id !== id);
-      setActiveSubmissions(updatedActive);
-      const allSubmissions = [...updatedActive, ...resolvedSubmissions];
-      localStorage.setItem('contactSubmissions', JSON.stringify(allSubmissions));
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
+        const products = await response.json();
+        if (products.length > 0) {
+          setProducts(products);
+        } else {
+          // Initialize with default products if database is empty
+          setProducts(defaultProducts);
+          // Save default products to database
+          await Promise.all(defaultProducts.map(product =>
+            fetch('/api/products', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(product)
+            })
+          ));
+        }
+      } else {
+        console.error('Failed to fetch products');
+        // Fallback to default products
+        setProducts(defaultProducts);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      // Fallback to default products
+      setProducts(defaultProducts);
+    }
+  };
+
+  const resolveSubmission = async (id: number) => {
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, resolved: true, resolvedAt: new Date().toISOString() })
+      });
+
+      if (response.ok) {
+        // Update local state
+        const submission = activeSubmissions.find(sub => sub.id === id);
+        if (submission) {
+          const resolvedSubmission = {
+            ...submission,
+            resolved: true,
+            resolvedAt: new Date().toISOString()
+          };
+
+          const updatedActive = activeSubmissions.filter(sub => sub.id !== id);
+          const updatedResolved = [...resolvedSubmissions, resolvedSubmission];
+
+          setActiveSubmissions(updatedActive);
+          setResolvedSubmissions(updatedResolved);
+        }
+      } else {
+        console.error('Failed to resolve submission');
+      }
+    } catch (error) {
+      console.error('Error resolving submission:', error);
+    }
+  };
+
+  const deleteSubmission = async (id: number, isResolved: boolean = false) => {
+    try {
+      const response = await fetch(`/api/contact?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        // Update local state
+        if (isResolved) {
+          const updatedResolved = resolvedSubmissions.filter(sub => sub.id !== id);
+          setResolvedSubmissions(updatedResolved);
+        } else {
+          const updatedActive = activeSubmissions.filter(sub => sub.id !== id);
+          setActiveSubmissions(updatedActive);
+        }
+      } else {
+        console.error('Failed to delete submission');
+      }
+    } catch (error) {
+      console.error('Error deleting submission:', error);
     }
   };
 
