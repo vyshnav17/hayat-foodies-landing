@@ -337,13 +337,39 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         updatedProducts = [...products, newProduct];
       }
 
-      setProducts(updatedProducts);
-      try {
-        localStorage.setItem('products', JSON.stringify(updatedProducts));
-      } catch (storageError) {
-        console.error('localStorage error:', storageError);
-        alert('Failed to save product. The image file may be too large for browser storage. Try using a smaller image file.');
-        return;
+      if (editingProduct) {
+        // Update existing product
+        const response = await fetch('/api/products', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProduct)
+        });
+
+        if (response.ok) {
+          const updatedProducts = products.map(p => p.id === editingProduct.id ? newProduct : p);
+          setProducts(updatedProducts);
+        } else {
+          console.error('Failed to update product');
+          alert('Failed to update product');
+          return;
+        }
+      } else {
+        // Add new product
+        const response = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newProduct)
+        });
+
+        if (response.ok) {
+          const addedProduct = await response.json();
+          const updatedProducts = [...products, addedProduct];
+          setProducts(updatedProducts);
+        } else {
+          console.error('Failed to add product');
+          alert('Failed to add product');
+          return;
+        }
       }
 
       // Reset form
@@ -380,10 +406,23 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     setIsProductDialogOpen(true);
   };
 
-  const deleteProduct = (id: number) => {
-    const updatedProducts = products.filter(p => p.id !== id);
-    setProducts(updatedProducts);
-    localStorage.setItem('products', JSON.stringify(updatedProducts));
+  const deleteProduct = async (id: number) => {
+    try {
+      const response = await fetch(`/api/products?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        const updatedProducts = products.filter(p => p.id !== id);
+        setProducts(updatedProducts);
+      } else {
+        console.error('Failed to delete product');
+        alert('Failed to delete product');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Error deleting product');
+    }
   };
 
   return (
