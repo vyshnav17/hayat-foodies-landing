@@ -235,13 +235,25 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       let imageUrls: string[] = [];
 
       if (productForm.images.length > 0) {
+        // Validate files before processing
+        for (const file of productForm.images) {
+          if (!file.type.startsWith('image/')) {
+            alert(`File "${file.name}" is not a valid image file. Please select image files only.`);
+            return;
+          }
+          if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            alert(`File "${file.name}" is too large (${(file.size / (1024 * 1024)).toFixed(2)}MB). Maximum size is 5MB.`);
+            return;
+          }
+        }
+
         const imagePromises = productForm.images.map(file => {
           return new Promise<string>((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result as string);
             reader.onerror = (e) => {
-              console.error('FileReader error:', e);
-              reject(new Error(`Failed to read file: ${file.name}`));
+              console.error('FileReader error for file:', file.name, e);
+              reject(new Error(`Failed to read image file: ${file.name}. The file may be corrupted or unsupported.`));
             };
             reader.readAsDataURL(file);
           });
