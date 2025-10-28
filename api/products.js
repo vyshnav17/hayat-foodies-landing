@@ -58,7 +58,7 @@ async function handler(req, res) {
       case 'POST':
         const newProduct = {
           ...req.body,
-          id: Date.now(),
+          id: Date.now().toString(),
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
@@ -72,7 +72,7 @@ async function handler(req, res) {
           return res.status(400).json({ error: 'Product ID is required' });
         }
         const updateResult = await collection.updateOne(
-          { id: parseInt(id) },
+          { id: id },
           {
             $set: {
               ...updateData,
@@ -91,7 +91,7 @@ async function handler(req, res) {
         if (!deleteId) {
           return res.status(400).json({ error: 'Product ID is required' });
         }
-        const deleteResult = await collection.deleteOne({ id: parseInt(deleteId) });
+        const deleteResult = await collection.deleteOne({ id: deleteId });
         if (deleteResult.deletedCount === 0) {
           return res.status(404).json({ error: 'Product not found' });
         }
