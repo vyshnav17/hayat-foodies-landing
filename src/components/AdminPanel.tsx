@@ -30,7 +30,7 @@ interface Product {
   id: number;
   name: string;
   description: string;
-  images: string[];
+  images: string[]; // base64 encoded images
   ingredients: string[];
   calories: number;
   price: number;
@@ -52,7 +52,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   const [productForm, setProductForm] = useState({
     name: '',
     description: '',
-    images: '',
+    images: [] as File[],
     ingredients: '',
     calories: '',
     price: '',
@@ -204,12 +204,23 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     document.body.removeChild(link);
   };
 
-  const handleProductSubmit = () => {
+  const handleProductSubmit = async () => {
+    const imagePromises = productForm.images.map(file => {
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    });
+
+    const imageUrls = await Promise.all(imagePromises);
+
     const newProduct: Product = {
       id: editingProduct ? editingProduct.id : Date.now(),
       name: productForm.name,
       description: productForm.description,
-      images: productForm.images.split(',').map(url => url.trim()),
+      images: imageUrls,
       ingredients: productForm.ingredients.split(',').map(ing => ing.trim()),
       calories: parseInt(productForm.calories),
       price: parseFloat(productForm.price),
@@ -230,7 +241,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     setProductForm({
       name: '',
       description: '',
-      images: '',
+      images: [],
       ingredients: '',
       calories: '',
       price: '',
@@ -245,7 +256,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     setProductForm({
       name: product.name,
       description: product.description,
-      images: product.images.join(', '),
+      images: [],
       ingredients: product.ingredients.join(', '),
       calories: product.calories.toString(),
       price: product.price.toString(),
@@ -538,13 +549,23 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <Label htmlFor="images">Images (comma-separated URLs)</Label>
+                      <Label htmlFor="images">Images</Label>
                       <Input
                         id="images"
-                        value={productForm.images}
-                        onChange={(e) => setProductForm({ ...productForm, images: e.target.value })}
-                        placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []);
+                          setProductForm({ ...productForm, images: files });
+                        }}
+                        placeholder="Select images"
                       />
+                      {productForm.images.length > 0 && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {productForm.images.length} file(s) selected
+                        </p>
+                      )}
                     </div>
                     <div className="md:col-span-2">
                       <Label htmlFor="ingredients">Ingredients (comma-separated)</Label>
