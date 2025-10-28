@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Trash2, Eye, Download, LogOut, CheckCircle, Plus, Edit, Save } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import chapatiImg from "@/assets/chapati.jpg";
 import creamBunImg from "@/assets/cream-bun.jpg";
 import chocolateBunImg from "@/assets/chocolate-bun.jpg";
@@ -264,12 +264,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold">Contact Form Submissions</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Admin Panel</h1>
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <Button onClick={exportToCSV} className="flex items-center justify-center gap-2 text-sm">
-              <Download className="w-4 h-4" />
-              Export CSV
-            </Button>
             <Button onClick={onLogout} variant="outline" className="flex items-center justify-center gap-2 text-sm">
               <LogOut className="w-4 h-4" />
               Logout
@@ -277,12 +273,203 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
           </div>
         </div>
 
-        <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto p-1">
-            <TabsTrigger value="products" className="text-xs sm:text-sm py-2">Products ({products.length})</TabsTrigger>
-            <TabsTrigger value="active" className="text-xs sm:text-sm py-2">Active ({activeSubmissions.length})</TabsTrigger>
-            <TabsTrigger value="resolved" className="text-xs sm:text-sm py-2">Resolved ({resolvedSubmissions.length})</TabsTrigger>
+        <Tabs defaultValue="contact" className="w-full">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 h-auto p-1">
+            <TabsTrigger value="contact" className="text-xs sm:text-sm py-2">Contact Submissions</TabsTrigger>
+            <TabsTrigger value="products" className="text-xs sm:text-sm py-2">Product Management ({products.length})</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="contact" className="space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h2 className="text-xl md:text-2xl font-bold">Contact Submissions</h2>
+              <Button onClick={exportToCSV} className="flex items-center justify-center gap-2 text-sm">
+                <Download className="w-4 h-4" />
+                Export CSV
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+              {/* Active Submissions List */}
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg md:text-xl">Active Submissions ({activeSubmissions.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {activeSubmissions.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">
+                        No active submissions
+                      </p>
+                    ) : (
+                      activeSubmissions.map((submission) => (
+                        <div
+                          key={submission.id}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-muted/50 cursor-pointer gap-2"
+                          onClick={() => setSelectedSubmission(submission)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                              <h3 className="font-semibold text-sm md:text-base truncate">{submission.name}</h3>
+                              <Badge variant="secondary" className="text-xs w-fit">
+                                {new Date(submission.timestamp).toLocaleDateString()}
+                              </Badge>
+                            </div>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate">{submission.email}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate max-w-full sm:max-w-xs">
+                              {submission.message.substring(0, 50)}...
+                            </p>
+                          </div>
+                          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSubmission(submission);
+                              }}
+                            >
+                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-green-600 hover:text-green-700 h-8 w-8 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                resolveSubmission(submission.id);
+                              }}
+                            >
+                              <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSubmission(submission.id);
+                              }}
+                            >
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Resolved Submissions List */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg md:text-xl">Resolved Submissions ({resolvedSubmissions.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {resolvedSubmissions.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">
+                        No resolved submissions
+                      </p>
+                    ) : (
+                      resolvedSubmissions.map((submission) => (
+                        <div
+                          key={submission.id}
+                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-muted/50 cursor-pointer bg-green-50 border-green-200 gap-2"
+                          onClick={() => setSelectedSubmission(submission)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                              <h3 className="font-semibold text-sm md:text-base truncate">{submission.name}</h3>
+                              <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs w-fit">
+                                Resolved
+                              </Badge>
+                            </div>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate">{submission.email}</p>
+                            <p className="text-xs md:text-sm text-muted-foreground truncate max-w-full sm:max-w-xs">
+                              {submission.message.substring(0, 50)}...
+                            </p>
+                          </div>
+                          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedSubmission(submission);
+                              }}
+                            >
+                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteSubmission(submission.id, true);
+                              }}
+                            >
+                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Submission Details */}
+              <div>
+                {selectedSubmission ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg md:text-xl">Submission Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3 md:space-y-4">
+                      <div>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Name</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.name}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Email</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.email}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Phone</label>
+                        <p className="text-sm md:text-lg break-words">{selectedSubmission.phone}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Message</label>
+                        <p className="text-sm md:text-lg whitespace-pre-wrap break-words">{selectedSubmission.message}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Submitted At</label>
+                        <p className="text-sm md:text-lg break-words">
+                          {new Date(selectedSubmission.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                      {selectedSubmission.resolved && (
+                        <div>
+                          <label className="text-xs md:text-sm font-medium text-muted-foreground">Resolved At</label>
+                          <p className="text-sm md:text-lg break-words">
+                            {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
+                          </p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardContent className="flex items-center justify-center h-48 md:h-64">
+                      <p className="text-muted-foreground text-center text-sm md:text-base">Select a submission to view details</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="products" className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -499,244 +686,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
             </div>
           </TabsContent>
 
-          <TabsContent value="active" className="space-y-4">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-              {/* Active Submissions List */}
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg md:text-xl">Active Submissions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {activeSubmissions.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        No active submissions
-                      </p>
-                    ) : (
-                      activeSubmissions.map((submission) => (
-                        <div
-                          key={submission.id}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-muted/50 cursor-pointer gap-2"
-                          onClick={() => setSelectedSubmission(submission)}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                              <h3 className="font-semibold text-sm md:text-base truncate">{submission.name}</h3>
-                              <Badge variant="secondary" className="text-xs w-fit">
-                                {new Date(submission.timestamp).toLocaleDateString()}
-                              </Badge>
-                            </div>
-                            <p className="text-xs md:text-sm text-muted-foreground truncate">{submission.email}</p>
-                            <p className="text-xs md:text-sm text-muted-foreground truncate max-w-full sm:max-w-xs">
-                              {submission.message.substring(0, 50)}...
-                            </p>
-                          </div>
-                          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedSubmission(submission);
-                              }}
-                            >
-                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-green-600 hover:text-green-700 h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                resolveSubmission(submission.id);
-                              }}
-                            >
-                              <CheckCircle className="w-3 h-3 md:w-4 md:h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteSubmission(submission.id);
-                              }}
-                            >
-                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
 
-              {/* Submission Details */}
-              <div>
-                {selectedSubmission ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg md:text-xl">Submission Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 md:space-y-4">
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Name</label>
-                        <p className="text-sm md:text-lg break-words">{selectedSubmission.name}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Email</label>
-                        <p className="text-sm md:text-lg break-words">{selectedSubmission.email}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Phone</label>
-                        <p className="text-sm md:text-lg break-words">{selectedSubmission.phone}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Message</label>
-                        <p className="text-sm md:text-lg whitespace-pre-wrap break-words">{selectedSubmission.message}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Submitted At</label>
-                        <p className="text-sm md:text-lg break-words">
-                          {new Date(selectedSubmission.timestamp).toLocaleString()}
-                        </p>
-                      </div>
-                      {selectedSubmission.resolved && (
-                        <div>
-                          <label className="text-xs md:text-sm font-medium text-muted-foreground">Resolved At</label>
-                          <p className="text-sm md:text-lg break-words">
-                            {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card>
-                    <CardContent className="flex items-center justify-center h-48 md:h-64">
-                      <p className="text-muted-foreground text-center text-sm md:text-base">Select a submission to view details</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="resolved" className="space-y-4">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
-              {/* Resolved Submissions List */}
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg md:text-xl">Resolved Submissions</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {resolvedSubmissions.length === 0 ? (
-                      <p className="text-muted-foreground text-center py-8">
-                        No resolved submissions
-                      </p>
-                    ) : (
-                      resolvedSubmissions.map((submission) => (
-                        <div
-                          key={submission.id}
-                          className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 border rounded-lg hover:bg-muted/50 cursor-pointer bg-green-50 border-green-200 gap-2"
-                          onClick={() => setSelectedSubmission(submission)}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
-                              <h3 className="font-semibold text-sm md:text-base truncate">{submission.name}</h3>
-                              <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs w-fit">
-                                Resolved
-                              </Badge>
-                            </div>
-                            <p className="text-xs md:text-sm text-muted-foreground truncate">{submission.email}</p>
-                            <p className="text-xs md:text-sm text-muted-foreground truncate max-w-full sm:max-w-xs">
-                              {submission.message.substring(0, 50)}...
-                            </p>
-                          </div>
-                          <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedSubmission(submission);
-                              }}
-                            >
-                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deleteSubmission(submission.id, true);
-                              }}
-                            >
-                              <Trash2 className="w-3 h-3 md:w-4 md:h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Submission Details */}
-              <div>
-                {selectedSubmission ? (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg md:text-xl">Submission Details</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 md:space-y-4">
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Name</label>
-                        <p className="text-sm md:text-lg break-words">{selectedSubmission.name}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Email</label>
-                        <p className="text-sm md:text-lg break-words">{selectedSubmission.email}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Phone</label>
-                        <p className="text-sm md:text-lg break-words">{selectedSubmission.phone}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Message</label>
-                        <p className="text-sm md:text-lg whitespace-pre-wrap break-words">{selectedSubmission.message}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs md:text-sm font-medium text-muted-foreground">Submitted At</label>
-                        <p className="text-sm md:text-lg break-words">
-                          {new Date(selectedSubmission.timestamp).toLocaleString()}
-                        </p>
-                      </div>
-                      {selectedSubmission.resolved && (
-                        <div>
-                          <label className="text-xs md:text-sm font-medium text-muted-foreground">Resolved At</label>
-                          <p className="text-sm md:text-lg break-words">
-                            {new Date(selectedSubmission.resolvedAt!).toLocaleString()}
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card>
-                    <CardContent className="flex items-center justify-center h-48 md:h-64">
-                      <p className="text-muted-foreground text-center text-sm md:text-base">Select a submission to view details</p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </div>
-          </TabsContent>
         </Tabs>
       </div>
     </div>

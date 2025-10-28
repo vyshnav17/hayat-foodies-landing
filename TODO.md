@@ -1,24 +1,15 @@
-# TODO: Make Admin Page Functional for Dynamic Product Management
+# Admin Panel Restructuring Tasks
 
-## Current Status
-- [x] Analyze codebase and create implementation plan
-- [x] Get user approval for plan
+## Section 1: Contact Submissions
+- [ ] Create Contact Submissions section header with title and Export CSV button
+- [ ] Add Active Queries sub-section with list and details view
+- [ ] Add Resolved Queries sub-section with list and details view
 
-## Implementation Steps
-- [x] Update AdminPanel.tsx to include "Products" tab alongside existing "Submissions" tabs
-- [x] Add product management UI: list existing products, add/edit/delete functionality
-- [x] Create product form with fields: name, description, ingredients (comma-separated), calories, price, gst, image URLs (comma-separated)
-- [x] Implement localStorage storage for products under 'products' key
-- [x] Modify Products.tsx to load products from localStorage, falling back to static array if empty
-- [ ] Handle image URLs instead of imported assets for dynamic products
-- [x] Add CRUD operations for products in AdminPanel
+## Section 2: Product Management
+- [ ] Create Product Management section header with title and Add Product button
+- [ ] Add Product List sub-section with list and details view
 
-## Testing Steps
-- [ ] Test product addition through admin panel
-- [ ] Verify products display correctly on main website
-- [ ] Ensure localStorage persistence works across sessions
-- [ ] Test product editing and deletion functionality
-
-## Followup
-- [x] Commit changes to repository
-- [ ] Deploy and verify functionality in production
+## General
+- [ ] Remove Tabs component and replace with two main sections
+- [ ] Ensure responsive layout and functionality
+- [ ] Test the restructured AdminPanel
