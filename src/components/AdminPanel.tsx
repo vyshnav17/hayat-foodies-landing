@@ -237,8 +237,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       if (productForm.images.length > 0) {
         // Validate files before processing
         for (const file of productForm.images) {
-          if (!file.type.startsWith('image/')) {
-            alert(`File "${file.name}" is not a valid image file. Please select image files only.`);
+          const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+          if (!allowedTypes.includes(file.type)) {
+            alert(`File "${file.name}" is not a supported image format. Please select JPG, PNG, GIF, or WebP files only.`);
             return;
           }
           if (file.size > 5 * 1024 * 1024) { // 5MB limit
@@ -253,7 +254,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
             reader.onload = () => resolve(reader.result as string);
             reader.onerror = (e) => {
               console.error('FileReader error for file:', file.name, e);
-              reject(new Error(`Unable to process the image file "${file.name}". Please ensure the file is a valid image and try again.`));
+              reject(new Error(`Unable to process the image file "${file.name}". Please ensure the file is a valid JPG/PNG/GIF image, not corrupted, and try again.`));
             };
             reader.readAsDataURL(file);
           });
