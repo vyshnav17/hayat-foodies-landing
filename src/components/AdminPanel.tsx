@@ -253,7 +253,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
             reader.onload = () => resolve(reader.result as string);
             reader.onerror = (e) => {
               console.error('FileReader error for file:', file.name, e);
-              reject(new Error(`Failed to read image file: ${file.name}. The file may be corrupted or unsupported.`));
+              reject(new Error(`Unable to process the image file "${file.name}". Please ensure the file is a valid image and try again.`));
             };
             reader.readAsDataURL(file);
           });
