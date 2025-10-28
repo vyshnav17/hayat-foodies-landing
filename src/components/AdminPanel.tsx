@@ -282,7 +282,13 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       }
 
       setProducts(updatedProducts);
-      localStorage.setItem('products', JSON.stringify(updatedProducts));
+      try {
+        localStorage.setItem('products', JSON.stringify(updatedProducts));
+      } catch (storageError) {
+        console.error('localStorage error:', storageError);
+        alert('Failed to save product. The image file may be too large for browser storage. Try using a smaller image file.');
+        return;
+      }
 
       // Reset form
       setProductForm({
