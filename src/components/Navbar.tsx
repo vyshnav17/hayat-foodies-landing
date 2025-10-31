@@ -155,7 +155,7 @@ const Navbar = () => {
               </SheetTrigger>
               <SheetContent side="right" className="w-full sm:w-80 bg-white/95 backdrop-blur-md">
                 <SheetHeader>
-                  <SheetTitle className="text-left">
+                  <SheetTitle className="flex justify-center">
                     <img src={logo} alt="Hayat Foods Logo" className="h-16 w-auto transition-transform duration-300 ease-in-out hover:scale-105" />
                   </SheetTitle>
                 </SheetHeader>
