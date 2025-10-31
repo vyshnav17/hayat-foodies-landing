@@ -149,8 +149,8 @@ const Navbar = () => {
           <div className="lg:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-brown hover:bg-cream/30 transition-all duration-300 ease-in-out">
-                  <Menu className="h-6 w-6 transition-transform duration-300 ease-in-out" />
+                <Button variant="ghost" size="icon" className="text-brown hover:bg-cream/30">
+                  <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-full sm:w-80 bg-white/95 backdrop-blur-md">
