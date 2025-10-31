@@ -1,5 +1,3 @@
-import 'dotenv/config';
-import admin from 'firebase-admin';
 import cors from 'cors';
 
 const corsHandler = cors({
@@ -7,17 +5,69 @@ const corsHandler = cors({
   credentials: true
 });
 
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
-  const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '{}');
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: process.env.FIREBASE_DATABASE_URL
-  });
-}
-
-const db = admin.firestore();
-const COLLECTION_NAME = 'products';
+// Default products data (same as in AdminPanel.tsx)
+const defaultProducts = [
+  {
+    id: "1",
+    name: "Chapati",
+    description: "Soft, fresh chapati made daily with premium ingredients",
+    images: ["/src/assets/chapati.jpg", "/src/assets/bread.jpg", "/src/assets/rusk.jpg"],
+    ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
+    calories: 150,
+    price: 20,
+    gst: 2,
+  },
+  {
+    id: "2",
+    name: "Cream Bun",
+    description: "Delicious cream-filled buns with smooth vanilla cream",
+    images: ["/src/assets/cream-bun.jpg", "/src/assets/chocolate-bun.jpg", "/src/assets/baby-chocolate-bun.jpg"],
+    ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
+    calories: 250,
+    price: 30,
+    gst: 3,
+  },
+  {
+    id: "3",
+    name: "Normal Buns",
+    description: "Freshly baked, delightfully soft—your perfect companion for any meal",
+    images: ["/src/assets/chocolate-bun.jpg", "/src/assets/cream-bun.jpg", "/src/assets/baby-chocolate-bun.jpg"],
+    ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
+    calories: 200,
+    price: 25,
+    gst: 2.5,
+  },
+  {
+    id: "4",
+    name: "Baby Chocolate Bun",
+    description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
+    images: ["/src/assets/baby-chocolate-bun.jpg", "/src/assets/chocolate-bun.jpg", "/src/assets/cream-bun.jpg"],
+    ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
+    calories: 180,
+    price: 15,
+    gst: 1.5,
+  },
+  {
+    id: "5",
+    name: "Bread",
+    description: "Fresh, soft bread baked to perfection every day",
+    images: ["/src/assets/bread.jpg", "/src/assets/chapati.jpg", "/src/assets/rusk.jpg"],
+    ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
+    calories: 120,
+    price: 40,
+    gst: 4,
+  },
+  {
+    id: "6",
+    name: "Rusk",
+    description: "Crispy, golden rusk perfect for tea time",
+    images: ["/src/assets/rusk.jpg", "/src/assets/bread.jpg", "/src/assets/chapati.jpg"],
+    ingredients: ["Flour", "Sugar", "Butter", "Eggs", "Yeast"],
+    calories: 100,
+    price: 35,
+    gst: 3.5,
+  },
+];
 
 function wrapCors(handler) {
   return (req, res) => {
@@ -34,44 +84,23 @@ async function handler(req, res) {
   try {
     switch (req.method) {
       case 'GET':
-        const productsSnapshot = await db.collection(COLLECTION_NAME).get();
-        const products = productsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        res.status(200).json(products);
+        // Return default products since Firebase is removed
+        res.status(200).json(defaultProducts);
         break;
 
       case 'POST':
-        const newProduct = {
-          ...req.body,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        const docRef = await db.collection(COLLECTION_NAME).add(newProduct);
-        res.status(201).json({ id: docRef.id, ...newProduct });
+        // No-op since Firebase is removed
+        res.status(201).json({ message: 'Product added (not stored - Firebase removed)' });
         break;
 
       case 'PUT':
-        const { id, ...updateData } = req.body;
-        if (!id) {
-          return res.status(400).json({ error: 'Product ID is required' });
-        }
-        const updateDataWithTimestamp = {
-          ...updateData,
-          updatedAt: new Date().toISOString()
-        };
-        await db.collection(COLLECTION_NAME).doc(id).update(updateDataWithTimestamp);
-        res.status(200).json({ message: 'Product updated successfully' });
+        // No-op since Firebase is removed
+        res.status(200).json({ message: 'Product update ignored (Firebase removed)' });
         break;
 
       case 'DELETE':
-        const deleteId = req.query.id;
-        if (!deleteId) {
-          return res.status(400).json({ error: 'Product ID is required' });
-        }
-        await db.collection(COLLECTION_NAME).doc(deleteId).delete();
-        res.status(200).json({ message: 'Product deleted successfully' });
+        // No-op since Firebase is removed
+        res.status(200).json({ message: 'Product deletion ignored (Firebase removed)' });
         break;
 
       default:

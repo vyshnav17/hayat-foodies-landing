@@ -66,15 +66,17 @@ const Contact = () => {
       // Object.entries(data).forEach(([key, value]) => formData.append(key, value));
       // await fetch('your-form-endpoint', { method: 'POST', body: formData });
 
-      // Option 4: Send to Vercel serverless function (if you have one)
-      // const response = await fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(submissionWithTimestamp)
-      // });
+      // Send to Vercel serverless function
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
 
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to send message');
+      }
 
       toast({
         title: "Message sent successfully!",
