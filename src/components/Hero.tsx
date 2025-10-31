@@ -119,37 +119,7 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Floating CTA Button - Bottom Right */}
-      <motion.div
-        className="fixed bottom-6 right-6 z-50"
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 3, duration: 0.5, type: "spring" }}
-      >
-        <motion.button
-          onClick={() => {
-            const contactSection = document.getElementById("contact");
-            contactSection?.scrollIntoView({ behavior: "smooth" });
-          }}
-          className="w-14 h-14 bg-accent hover:bg-accent/90 text-accent-foreground rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 transform"
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-            />
-          </svg>
-        </motion.button>
-      </motion.div>
+
     </section>
   );
 };

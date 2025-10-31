@@ -146,7 +146,44 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          <div className="lg:hidden flex items-center space-x-2">
+            {/* Mobile Contact CTA */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-brown hover:text-terracotta hover:bg-cream/30 transition-all duration-300 ease-in-out hover:scale-110 transform"
+              onClick={() => scrollToSection("contact")}
+            >
+              <Phone className="h-5 w-5 transition-transform duration-300 ease-in-out" />
+            </Button>
+
+            {/* Mobile Chatbot CTA */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-brown hover:text-terracotta hover:bg-cream/30 transition-all duration-300 ease-in-out hover:scale-110 transform"
+              onClick={() => {
+                const chatbot = document.querySelector('[data-chatbot-toggle]');
+                if (chatbot) {
+                  (chatbot as HTMLElement).click();
+                }
+              }}
+            >
+              <svg
+                className="h-5 w-5 transition-transform duration-300 ease-in-out"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+            </Button>
+
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-brown hover:bg-cream/30 transition-all duration-300 ease-in-out">

@@ -121,14 +121,15 @@ const Chatbot = () => {
 
   return (
     <>
-      {/* Chatbot Toggle Button */}
+      {/* Chatbot Toggle Button - Hidden on mobile, shown on desktop */}
       <motion.div
-        className="fixed bottom-6 left-6 z-50"
+        className="fixed bottom-6 left-6 z-50 hidden md:block"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 3.2, duration: 0.5, type: "spring" }}
       >
         <motion.button
+          data-chatbot-toggle
           onClick={() => setIsOpen(!isOpen)}
           className="w-14 h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg hover:shadow-xl flex items-center justify-center transition-all duration-300 transform"
           whileHover={{ scale: 1.1, rotate: 5 }}
