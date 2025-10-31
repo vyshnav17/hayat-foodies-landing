@@ -146,44 +146,7 @@ const Navbar = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="lg:hidden flex items-center space-x-2">
-            {/* Mobile Contact CTA */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-brown hover:text-terracotta hover:bg-cream/30 transition-all duration-300 ease-in-out hover:scale-110 transform"
-              onClick={() => scrollToSection("contact")}
-            >
-              <Phone className="h-5 w-5 transition-transform duration-300 ease-in-out" />
-            </Button>
-
-            {/* Mobile Chatbot CTA */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-brown hover:text-terracotta hover:bg-cream/30 transition-all duration-300 ease-in-out hover:scale-110 transform"
-              onClick={() => {
-                const chatbot = document.querySelector('[data-chatbot-toggle]');
-                if (chatbot) {
-                  (chatbot as HTMLElement).click();
-                }
-              }}
-            >
-              <svg
-                className="h-5 w-5 transition-transform duration-300 ease-in-out"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-            </Button>
-
+          <div className="lg:hidden">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="text-brown hover:bg-cream/30 transition-all duration-300 ease-in-out">
@@ -253,6 +216,45 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3 group">
                       <MapPin className="h-4 w-4 text-terracotta transition-transform duration-300 ease-in-out group-hover:scale-110" />
                       <span className="text-sm transition-colors duration-300 ease-in-out">Kannur, Kerala</span>
+                    </div>
+                  </div>
+
+                  {/* Mobile CTA Buttons */}
+                  <div className="border-t border-cream/30 pt-6 space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex items-center justify-center gap-2 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform py-3"
+                        onClick={() => scrollToSection("contact")}
+                      >
+                        <Phone className="h-4 w-4" />
+                        Contact
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="flex items-center justify-center gap-2 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform py-3"
+                        onClick={() => {
+                          const chatbot = document.querySelector('[data-chatbot-toggle]');
+                          if (chatbot) {
+                            (chatbot as HTMLElement).click();
+                          }
+                        }}
+                      >
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                          />
+                        </svg>
+                        Chat
+                      </Button>
                     </div>
                   </div>
 
