@@ -46,6 +46,20 @@ All colors MUST be HSL.
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 
+    /* Animation and 3D effect variables */
+    --parallax-speed-slow: 0.3;
+    --parallax-speed-medium: 0.5;
+    --parallax-speed-fast: 0.8;
+    --perspective: 1000px;
+    --transform-3d: preserve-3d;
+    --backface-visibility: hidden;
+
+    /* Performance optimization variables */
+    --will-change-transform: transform;
+    --will-change-opacity: opacity;
+    --transform-gpu: translateZ(0);
+    --reduced-motion: reduce;
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -109,5 +123,44 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Performance optimizations for animations */
+@layer utilities {
+  .will-change-transform {
+    will-change: transform;
+  }
+
+  .will-change-opacity {
+    will-change: opacity;
+  }
+
+  .transform-gpu {
+    transform: translateZ(0);
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

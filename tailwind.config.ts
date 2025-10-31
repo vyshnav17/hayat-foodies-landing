@@ -135,6 +135,81 @@ export default {
             transform: "translateY(-10px)"
           }
         },
+        "text-reveal": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(20px) rotateX(90deg)"
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0) rotateX(0deg)"
+          }
+        },
+        "typewriter": {
+          "0%": {
+            width: "0"
+          },
+          "100%": {
+            width: "100%"
+          }
+        },
+        "blink": {
+          "0%, 50%": {
+            borderColor: "transparent"
+          },
+          "51%, 100%": {
+            borderColor: "currentColor"
+          }
+        },
+        "ar-vr-rotate": {
+          "0%": {
+            transform: "rotateX(0deg) rotateY(0deg)"
+          },
+          "25%": {
+            transform: "rotateX(90deg) rotateY(90deg)"
+          },
+          "50%": {
+            transform: "rotateX(180deg) rotateY(180deg)"
+          },
+          "75%": {
+            transform: "rotateX(270deg) rotateY(270deg)"
+          },
+          "100%": {
+            transform: "rotateX(360deg) rotateY(360deg)"
+          }
+        },
+        "collaborative-pulse": {
+          "0%, 100%": {
+            transform: "scale(1)",
+            opacity: "1"
+          },
+          "50%": {
+            transform: "scale(1.05)",
+            opacity: "0.8"
+          }
+        },
+        "3d-flip": {
+          "0%": {
+            transform: "perspective(1000px) rotateY(0deg)"
+          },
+          "100%": {
+            transform: "perspective(1000px) rotateY(180deg)"
+          }
+        },
+        "morph-blob": {
+          "0%, 100%": {
+            borderRadius: "60% 40% 30% 70% / 60% 30% 70% 40%"
+          },
+          "25%": {
+            borderRadius: "30% 60% 70% 40% / 50% 60% 30% 60%"
+          },
+          "50%": {
+            borderRadius: "50% 40% 50% 60% / 30% 50% 70% 40%"
+          },
+          "75%": {
+            borderRadius: "40% 50% 60% 30% / 70% 40% 50% 60%"
+          }
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.3s ease-out",
@@ -144,6 +219,13 @@ export default {
         "scale-in": "scale-in 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
         "slide-in": "slide-in 0.6s cubic-bezier(0.4, 0, 0.2, 1)",
         "float": "float 3s ease-in-out infinite",
+        "text-reveal": "text-reveal 1s cubic-bezier(0.4, 0, 0.2, 1)",
+        "typewriter": "typewriter 2s steps(40, end)",
+        "blink": "blink 1s infinite",
+        "ar-vr-rotate": "ar-vr-rotate 8s ease-in-out infinite",
+        "collaborative-pulse": "collaborative-pulse 2s ease-in-out infinite",
+        "3d-flip": "3d-flip 1s cubic-bezier(0.4, 0, 0.2, 1)",
+        "morph-blob": "morph-blob 8s ease-in-out infinite",
       },
     },
   },

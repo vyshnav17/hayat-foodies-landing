@@ -3,6 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Skeleton } from "@/components/ui/skeleton";
+import { motion } from "framer-motion";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import Autoplay from "embla-carousel-autoplay";
 import chapatiImg from "@/assets/chapati.jpg";
 import creamBunImg from "@/assets/cream-bun.jpg";
@@ -74,6 +76,9 @@ const Products = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imagesLoaded, setImagesLoaded] = useState<Record<string, boolean>>({});
 
+  const { elementRef: titleRef, isVisible: titleVisible } = useScrollAnimation({ threshold: 0.3 });
+  const { elementRef: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.2 });
+
   useEffect(() => {
     // Load products from localStorage, fallback to defaultProducts
     const storedProducts = JSON.parse(localStorage.getItem('products') || '[]');
@@ -95,44 +100,159 @@ const Products = () => {
     });
   }, [products]);
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: "spring" as const,
+        stiffness: 100,
+        damping: 15
+      }
+    }
+  };
+
   return (
     <section id="products" className="py-16 md:py-20 bg-background">
       <div className="container px-4">
-        <div className="text-center mb-12 md:mb-16 animate-fade-in">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-foreground">
+        <motion.div
+          ref={titleRef}
+          className="text-center mb-12 md:mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={titleVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+        >
+          <motion.h2
+            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-foreground"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={titleVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             Our Premium Products
-          </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p
+            className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={titleVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
             Discover our range of freshly baked products, made with love and the finest ingredients
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto">
+        <motion.div
+          ref={gridRef}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 max-w-6xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate={gridVisible ? "visible" : "hidden"}
+        >
           {products.map((product, index) => (
-            <Card
+            <motion.div
               key={product.name}
-              className="group overflow-hidden border-border hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 animate-scale-in transform cursor-pointer"
-              style={{ animationDelay: `${index * 0.15}s` }}
-              onClick={() => {
-                setSelectedProduct(product);
-                setDialogOpen(true);
+              variants={cardVariants}
+              whileHover={{
+                y: -15,
+                scale: 1.03,
+                rotateY: 5,
+                transition: { duration: 0.3 }
               }}
+              whileTap={{ scale: 0.98 }}
             >
-              <div className="relative h-64 overflow-hidden">
-                <img
-                  src={product.images[0]}
-                  alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 group-hover:rotate-2"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500" />
-              </div>
-              <CardContent className="p-6 transition-all duration-500">
-                <h3 className="text-2xl font-bold mb-2 text-foreground transition-colors duration-300 group-hover:text-primary">{product.name}</h3>
-                <p className="text-muted-foreground transition-all duration-300">{product.description}</p>
-              </CardContent>
-            </Card>
+              <Card
+                className="group overflow-hidden border-border hover:shadow-2xl transition-all duration-500 transform cursor-pointer h-full"
+                onClick={() => {
+                  setSelectedProduct(product);
+                  setDialogOpen(true);
+                }}
+              >
+                <div className="relative h-64 overflow-hidden">
+                  <motion.img
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    whileHover={{
+                      scale: 1.2,
+                      rotate: 3,
+                      transition: { duration: 0.5 }
+                    }}
+                    initial={{ scale: 1.1 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: 0.5 }}
+                  />
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"
+                    initial={{ opacity: 0 }}
+                    whileHover={{
+                      opacity: 1,
+                      transition: { duration: 0.3 }
+                    }}
+                  />
+                  <motion.div
+                    className="absolute top-4 right-4 bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold"
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    transition={{
+                      delay: 0.5 + index * 0.1,
+                      type: "spring",
+                      stiffness: 200
+                    }}
+                  >
+                    ₹{product.price + product.gst}
+                  </motion.div>
+                </div>
+                <CardContent className="p-6">
+                  <motion.h3
+                    className="text-2xl font-bold mb-2 text-foreground group-hover:text-primary transition-colors duration-300"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={gridVisible ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ delay: 0.3 + index * 0.1 }}
+                  >
+                    {product.name}
+                  </motion.h3>
+                  <motion.p
+                    className="text-muted-foreground"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={gridVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                    transition={{ delay: 0.4 + index * 0.1 }}
+                  >
+                    {product.description}
+                  </motion.p>
+                  <motion.div
+                    className="mt-4 flex items-center justify-between"
+                    initial={{ opacity: 0 }}
+                    animate={gridVisible ? { opacity: 1 } : { opacity: 0 }}
+                    transition={{ delay: 0.5 + index * 0.1 }}
+                  >
+                    <span className="text-sm text-muted-foreground">
+                      {product.calories} kcal
+                    </span>
+                    <motion.button
+                      className="text-primary hover:text-primary/80 font-semibold text-sm"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      View Details →
+                    </motion.button>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-4xl w-full mx-0 rounded-xl p-6 md:p-8">
