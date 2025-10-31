@@ -1,32 +1,13 @@
-# Animation Enhancement TODO List
+# TODO: Change Admin Email for Contact Form
 
-## Completed Tasks
-- [x] Analyze current codebase and create enhancement plan
-- [x] Install Framer Motion for advanced React animations
-- [x] Create scroll-triggered animation hooks (useScrollAnimation.tsx, useParallax.tsx)
-- [x] Update tailwind.config.ts with advanced keyframes for AR/VR effects and 3D transforms
-- [x] Update src/index.css with CSS variables for parallax and 3D effects
-- [x] Create TypographyAnimation.tsx component for expressive text effects
-- [x] Create ARVRGraphics.tsx component for motion graphics simulations (removed from Hero as per feedback)
-- [x] Update Hero.tsx with parallax scrolling and typography animations
-- [x] Update About.tsx with scroll-triggered staggered animations
-- [x] Update Products.tsx with enhanced hover effects and advanced animations
-- [x] Update Contact.tsx with form field animations and submit effects
-- [x] Update Availability.tsx with scroll-triggered reveals
-- [x] Optimize animation performance with will-change, transform3d, and reduced motion support
-- [x] Test animations across devices and add responsive adjustments
-- [x] Add floating contact CTA button in bottom-right
-- [x] Add chatbot CTA button in bottom-left with full chatbot functionality
-- [x] Final testing and optimization
-- [x] Commit all changes to git repository
+## Tasks to Complete
 
-## Project Status: ✅ COMPLETE
+- [ ] Update local .env file: Change ADMIN_EMAIL from "v17vyshnavtv@gmail.com" to "abhishekkochi7@gmail.com"
+- [ ] Update Vercel environment variables: In Vercel dashboard, set ADMIN_EMAIL to "abhishekkochi7@gmail.com" for production
+- [ ] Test contact form submission to verify emails are sent to the new admin email address
+- [ ] Redeploy on Vercel if environment variable update requires it
 
-All animation enhancements and chatbot functionality have been successfully implemented and committed to the repository. The Hayat Foods website now features:
-
-- Advanced Framer Motion animations throughout
-- Scroll-triggered effects and parallax scrolling
-- Comprehensive chatbot with Hayat Foods Q&A system
-- Dual floating CTA buttons for enhanced user engagement
-- Performance optimizations and responsive design
-- Professional animations that enhance user experience without being distracting
+## Notes
+- The contact form code in api/contact.js already uses process.env.ADMIN_EMAIL, so no code changes are needed.
+- Local development will use the .env file.
+- Production uses Vercel environment variables.
