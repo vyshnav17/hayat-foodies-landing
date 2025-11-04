@@ -19,7 +19,7 @@ const defaultProducts = [
     description: "Soft, fresh chapati made daily with premium ingredients",
     images: [chapatiImg, breadImg, ruskImg],
     ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
-    weight: 150,
+    weight: 450,
     price: 60,
     gst: 3,
   },
@@ -28,7 +28,7 @@ const defaultProducts = [
     description: "Delicious cream-filled buns with smooth vanilla cream",
     images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
     ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
-    weight: 250,
+    quantity: 4,
     price: 45,
     gst: 2.25,
   },
@@ -37,7 +37,7 @@ const defaultProducts = [
     description: "Freshly baked, delightfully soft—your perfect companion for any meal",
     images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
     ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
-    weight: 200,
+    quantity: 2,
     price: 20,
     gst: 1,
   },
@@ -46,7 +46,7 @@ const defaultProducts = [
     description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
     images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
     ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
-    weight: 180,
+    quantity: 5,
     price: 40,
     gst: 2,
   },
@@ -55,7 +55,7 @@ const defaultProducts = [
     description: "Fresh, soft bread baked to perfection every day",
     images: [breadImg, chapatiImg, ruskImg],
     ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
-    weight: 120,
+    weight: 300,
     price: 40,
     gst: 2,
   },
@@ -262,7 +262,7 @@ const Products = () => {
                     transition={{ delay: 0.5 + index * 0.1 }}
                   >
                     <span className="text-sm text-muted-foreground">
-                      {product.weight} gm
+                      {product.weight ? `${product.weight} gm` : `${product.quantity} pieces`}
                     </span>
                     <motion.button
                       className="text-primary hover:text-primary/80 font-semibold text-sm"
@@ -312,7 +312,7 @@ const Products = () => {
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs md:text-sm"><strong>Weight:</strong> {selectedProduct.weight} gm</p>
+                    <p className="text-xs md:text-sm"><strong>{selectedProduct.weight ? 'Weight:' : 'Quantity:'}</strong> {selectedProduct.weight ? `${selectedProduct.weight} gm` : `${selectedProduct.quantity} pieces`}</p>
                   </div>
                   <div>
                     <p className="text-base md:text-lg font-bold">Price: ₹{selectedProduct.price}</p>
