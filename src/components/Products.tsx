@@ -21,6 +21,7 @@ const defaultProducts = [
     ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
     calories: 150,
     price: 60,
+    gst: 3,
   },
   {
     name: "Cream Bun",
@@ -29,7 +30,7 @@ const defaultProducts = [
     ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
     calories: 250,
     price: 45,
-    gst: 3,
+    gst: 2.25,
   },
   {
     name: "Normal Buns",
@@ -38,7 +39,7 @@ const defaultProducts = [
     ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
     calories: 200,
     price: 20,
-    gst: 2.5,
+    gst: 1,
   },
   {
     name: "Baby Chocolate Bun",
@@ -47,7 +48,7 @@ const defaultProducts = [
     ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
     calories: 180,
     price: 40,
-    gst: 1.5,
+    gst: 2,
   },
   {
     name: "Bread",
@@ -56,7 +57,7 @@ const defaultProducts = [
     ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
     calories: 120,
     price: 40,
-    gst: 4,
+    gst: 2,
   },
   {
     name: "Rusk",
