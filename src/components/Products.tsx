@@ -19,7 +19,7 @@ const defaultProducts = [
     description: "Soft, fresh chapati made daily with premium ingredients",
     images: [chapatiImg, breadImg, ruskImg],
     ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
-    calories: 150,
+    weight: 150,
     price: 60,
     gst: 3,
   },
@@ -28,7 +28,7 @@ const defaultProducts = [
     description: "Delicious cream-filled buns with smooth vanilla cream",
     images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
     ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
-    calories: 250,
+    weight: 250,
     price: 45,
     gst: 2.25,
   },
@@ -37,7 +37,7 @@ const defaultProducts = [
     description: "Freshly baked, delightfully soft—your perfect companion for any meal",
     images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
     ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
-    calories: 200,
+    weight: 200,
     price: 20,
     gst: 1,
   },
@@ -46,7 +46,7 @@ const defaultProducts = [
     description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
     images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
     ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
-    calories: 180,
+    weight: 180,
     price: 40,
     gst: 2,
   },
@@ -55,7 +55,7 @@ const defaultProducts = [
     description: "Fresh, soft bread baked to perfection every day",
     images: [breadImg, chapatiImg, ruskImg],
     ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
-    calories: 120,
+    weight: 120,
     price: 40,
     gst: 2,
   },
@@ -64,8 +64,8 @@ const defaultProducts = [
     description: "Crispy, golden rusk perfect for tea time",
     images: [ruskImg, breadImg, chapatiImg],
     ingredients: ["Flour", "Sugar", "Butter", "Eggs", "Yeast"],
-    calories: 100,
-    price: 35,
+    weight: 250,
+    price: 45,
     gst: 3.5,
   },
 ];
@@ -266,7 +266,7 @@ const Products = () => {
                     transition={{ delay: 0.5 + index * 0.1 }}
                   >
                     <span className="text-sm text-muted-foreground">
-                      {product.calories} kcal
+                      {product.weight} gm
                     </span>
                     <motion.button
                       className="text-primary hover:text-primary/80 font-semibold text-sm"
@@ -316,7 +316,7 @@ const Products = () => {
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs md:text-sm"><strong>Calories:</strong> {selectedProduct.calories} kcal</p>
+                    <p className="text-xs md:text-sm"><strong>Weight:</strong> {selectedProduct.weight} gm</p>
                   </div>
                   <div>
                     <p className="text-base md:text-lg font-bold">Price: ₹{selectedProduct.price}</p>

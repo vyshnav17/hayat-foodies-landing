@@ -13,7 +13,7 @@ const defaultProducts = [
     description: "Soft, fresh chapati made daily with premium ingredients",
     images: ["/assets/chapati.jpg", "/assets/bread.jpg", "/assets/rusk.jpg"],
     ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
-    calories: 150,
+    weight: 150,
     price: 60,
   },
   {
@@ -22,7 +22,7 @@ const defaultProducts = [
     description: "Delicious cream-filled buns with smooth vanilla cream",
     images: ["/assets/cream-bun.jpg", "/assets/chocolate-bun.jpg", "/assets/baby-chocolate-bun.jpg"],
     ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
-    calories: 250,
+    weight: 250,
     price: 45,
   },
   {
@@ -31,7 +31,7 @@ const defaultProducts = [
     description: "Freshly baked, delightfully soft—your perfect companion for any meal",
     images: ["/assets/chocolate-bun.jpg", "/assets/cream-bun.jpg", "/assets/baby-chocolate-bun.jpg"],
     ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
-    calories: 200,
+    weight: 200,
     price: 20,
   },
   {
@@ -40,7 +40,7 @@ const defaultProducts = [
     description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
     images: ["/assets/baby-chocolate-bun.jpg", "/assets/chocolate-bun.jpg", "/assets/cream-bun.jpg"],
     ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
-    calories: 180,
+    weight: 180,
     price: 40,
   },
   {
@@ -49,7 +49,7 @@ const defaultProducts = [
     description: "Fresh, soft bread baked to perfection every day",
     images: ["/assets/bread.jpg", "/assets/chapati.jpg", "/assets/rusk.jpg"],
     ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
-    calories: 120,
+    weight: 120,
     price: 40,
   },
   {
@@ -58,8 +58,8 @@ const defaultProducts = [
     description: "Crispy, golden rusk perfect for tea time",
     images: ["/assets/rusk.jpg", "/assets/bread.jpg", "/assets/chapati.jpg"],
     ingredients: ["Flour", "Sugar", "Butter", "Eggs", "Yeast"],
-    calories: 100,
-    price: 35,
+    weight: 250,
+    price: 45,
   },
 ];
 
