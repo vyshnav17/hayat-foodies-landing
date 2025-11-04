@@ -68,7 +68,6 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
       calories: 150,
       price: 60,
-      gst: 3,
     },
     {
       id: "2",
@@ -78,7 +77,6 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
       calories: 250,
       price: 45,
-      gst: 2.25,
     },
     {
       id: "3",
@@ -88,7 +86,6 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
       calories: 200,
       price: 20,
-      gst: 1,
     },
     {
       id: "4",
@@ -98,7 +95,6 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
       calories: 180,
       price: 40,
-      gst: 2,
     },
     {
       id: "5",
@@ -108,7 +104,6 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
       calories: 120,
       price: 40,
-      gst: 2,
     },
     {
       id: "6",
@@ -118,7 +113,6 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Flour", "Sugar", "Butter", "Eggs", "Yeast"],
       calories: 100,
       price: 35,
-      gst: 3.5,
     },
   ];
 

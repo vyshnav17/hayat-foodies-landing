@@ -239,7 +239,7 @@ const Products = () => {
                       stiffness: 200
                     }}
                   >
-                    ₹{product.price + product.gst}
+                    ₹{product.price}
                   </motion.div>
                 </div>
                 <CardContent className="p-6">
@@ -319,7 +319,7 @@ const Products = () => {
                     <p className="text-xs md:text-sm"><strong>Calories:</strong> {selectedProduct.calories} kcal</p>
                   </div>
                   <div>
-                    <p className="text-base md:text-lg font-bold">Price: ₹{selectedProduct.price + selectedProduct.gst} (including GST)</p>
+                    <p className="text-base md:text-lg font-bold">Price: ₹{selectedProduct.price}</p>
                   </div>
                 </div>
               </div>
