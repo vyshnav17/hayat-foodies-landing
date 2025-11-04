@@ -20,8 +20,7 @@ const defaultProducts = [
     images: [chapatiImg, breadImg, ruskImg],
     ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
     calories: 150,
-    price: 20,
-    gst: 2,
+    price: 60,
   },
   {
     name: "Cream Bun",
@@ -29,7 +28,7 @@ const defaultProducts = [
     images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
     ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
     calories: 250,
-    price: 30,
+    price: 45,
     gst: 3,
   },
   {
@@ -38,7 +37,7 @@ const defaultProducts = [
     images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
     ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
     calories: 200,
-    price: 25,
+    price: 20,
     gst: 2.5,
   },
   {
@@ -47,7 +46,7 @@ const defaultProducts = [
     images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
     ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
     calories: 180,
-    price: 15,
+    price: 40,
     gst: 1.5,
   },
   {
