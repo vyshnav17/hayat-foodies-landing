@@ -67,8 +67,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       images: [chapatiImg, breadImg, ruskImg],
       ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
       calories: 150,
-      price: 20,
-      gst: 2,
+      price: 60,
+      gst: 3,
     },
     {
       id: "2",
@@ -77,8 +77,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
       ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
       calories: 250,
-      price: 30,
-      gst: 3,
+      price: 45,
+      gst: 2.25,
     },
     {
       id: "3",
@@ -87,8 +87,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
       ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
       calories: 200,
-      price: 25,
-      gst: 2.5,
+      price: 20,
+      gst: 1,
     },
     {
       id: "4",
@@ -97,8 +97,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
       ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
       calories: 180,
-      price: 15,
-      gst: 1.5,
+      price: 40,
+      gst: 2,
     },
     {
       id: "5",
@@ -108,7 +108,7 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
       calories: 120,
       price: 40,
-      gst: 4,
+      gst: 2,
     },
     {
       id: "6",

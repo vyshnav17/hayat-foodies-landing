@@ -79,12 +79,40 @@ const Products = () => {
   const { elementRef: titleRef, isVisible: titleVisible } = useScrollAnimation({ threshold: 0.3 });
   const { elementRef: gridRef, isVisible: gridVisible } = useScrollAnimation({ threshold: 0.2 });
 
-  useEffect(() => {
-    // Load products from localStorage, fallback to defaultProducts
-    const storedProducts = JSON.parse(localStorage.getItem('products') || '[]');
-    if (storedProducts.length > 0) {
-      setProducts(storedProducts);
+  const fetchProducts = async () => {
+    try {
+      const response = await fetch('/api/products');
+      if (response.ok) {
+        const products = await response.json();
+        if (products.length > 0) {
+          setProducts(products);
+        } else {
+          // Initialize with default products if database is empty
+          setProducts(defaultProducts);
+          // Save default products to database
+          await Promise.all(defaultProducts.map(product =>
+            fetch('/api/products', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(product)
+            })
+          ));
+        }
+      } else {
+        console.error('Failed to fetch products');
+        // Fallback to default products
+        setProducts(defaultProducts);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      // Fallback to default products
+      setProducts(defaultProducts);
     }
+  };
+
+  useEffect(() => {
+    // Load products from API, fallback to defaultProducts
+    fetchProducts();
   }, []);
 
   useEffect(() => {
