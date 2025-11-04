@@ -32,9 +32,10 @@ interface Product {
   description: string;
   images: string[]; // image URLs
   ingredients: string[];
-  calories: number;
+  weight?: number;
+  quantity?: number;
   price: number;
-  gst: number;
+  gst?: number;
 }
 
 interface AdminPanelProps {
@@ -54,7 +55,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     description: '',
     images: '',
     ingredients: '',
-    calories: '',
+    weight: '',
+    quantity: '',
     price: '',
     gst: ''
   });
@@ -66,8 +68,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: "Soft, fresh chapati made daily with premium ingredients",
       images: [chapatiImg, breadImg, ruskImg],
       ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
-      calories: 150,
+      weight: 450,
       price: 60,
+      gst: 5,
     },
     {
       id: "2",
@@ -75,8 +78,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: "Delicious cream-filled buns with smooth vanilla cream",
       images: [creamBunImg, chocolateBunImg, babyChocolateBunImg],
       ingredients: ["Flour", "Cream", "Sugar", "Yeast", "Vanilla"],
-      calories: 250,
+      quantity: 4,
       price: 45,
+      gst: 5,
     },
     {
       id: "3",
@@ -84,8 +88,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: "Freshly baked, delightfully soft—your perfect companion for any meal",
       images: [chocolateBunImg, creamBunImg, babyChocolateBunImg],
       ingredients: ["Flour", "Sugar", "Yeast", "Milk", "Butter"],
-      calories: 200,
+      quantity: 2,
       price: 20,
+      gst: 5,
     },
     {
       id: "4",
@@ -93,8 +98,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: "Soft, rich, and perfectly sized for a satisfying chocolate treat.",
       images: [babyChocolateBunImg, chocolateBunImg, creamBunImg],
       ingredients: ["Flour", "Chocolate", "Sugar", "Yeast", "Butter"],
-      calories: 180,
+      quantity: 5,
       price: 40,
+      gst: 5,
     },
     {
       id: "5",
@@ -102,8 +108,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: "Fresh, soft bread baked to perfection every day",
       images: [breadImg, chapatiImg, ruskImg],
       ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
-      calories: 120,
+      weight: 300,
       price: 40,
+      gst: 5,
     },
     {
       id: "6",
@@ -111,8 +118,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: "Crispy, golden rusk perfect for tea time",
       images: [ruskImg, breadImg, chapatiImg],
       ingredients: ["Flour", "Sugar", "Butter", "Eggs", "Yeast"],
-      calories: 100,
+      weight: 100,
       price: 35,
+      gst: 5,
     },
   ];
 
@@ -272,8 +280,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       alert('Valid GST percentage is required');
       return;
     }
-    if (!productForm.calories.trim() || isNaN(parseInt(productForm.calories))) {
-      alert('Valid calories is required');
+    if ((!productForm.weight.trim() || isNaN(parseFloat(productForm.weight))) && (!productForm.quantity.trim() || isNaN(parseFloat(productForm.quantity)))) {
+      alert('Either valid weight or quantity is required');
       return;
     }
     if (!productForm.ingredients.trim()) {
@@ -284,15 +292,21 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     try {
       const imageUrls = productForm.images.split(',').map(url => url.trim()).filter(url => url);
 
-      const productData = {
+      const productData: Omit<Product, 'id'> = {
         name: productForm.name.trim(),
         description: productForm.description.trim(),
         images: imageUrls,
         ingredients: productForm.ingredients.split(',').map(ing => ing.trim()).filter(ing => ing),
-        calories: parseInt(productForm.calories),
         price: parseFloat(productForm.price),
         gst: parseFloat(productForm.gst)
       };
+
+      if (productForm.weight.trim()) {
+        productData.weight = parseFloat(productForm.weight);
+      }
+      if (productForm.quantity.trim()) {
+        productData.quantity = parseFloat(productForm.quantity);
+      }
 
       let response;
       let successMessage;
@@ -329,7 +343,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
           description: '',
           images: '',
           ingredients: '',
-          calories: '',
+          weight: '',
+          quantity: '',
           price: '',
           gst: ''
         });
@@ -355,7 +370,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       description: product.description,
       images: product.images.join(', '),
       ingredients: product.ingredients.join(', '),
-      calories: product.calories.toString(),
+      weight: product.weight?.toString() || '',
+      quantity: product.quantity?.toString() || '',
       price: product.price.toString(),
       gst: product.gst.toString()
     });
@@ -617,13 +633,23 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="calories">Calories</Label>
+                      <Label htmlFor="weight">Weight (g)</Label>
                       <Input
-                        id="calories"
+                        id="weight"
                         type="number"
-                        value={productForm.calories}
-                        onChange={(e) => setProductForm({ ...productForm, calories: e.target.value })}
-                        placeholder="Calories"
+                        value={productForm.weight}
+                        onChange={(e) => setProductForm({ ...productForm, weight: e.target.value })}
+                        placeholder="Weight in grams"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="quantity">Quantity</Label>
+                      <Input
+                        id="quantity"
+                        type="number"
+                        value={productForm.quantity}
+                        onChange={(e) => setProductForm({ ...productForm, quantity: e.target.value })}
+                        placeholder="Quantity"
                       />
                     </div>
                     <div className="md:col-span-2">
@@ -766,9 +792,15 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                         <p className="text-lg">{selectedProduct.description}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-muted-foreground">Calories</label>
-                        <p className="text-lg">{selectedProduct.calories}</p>
+                        <label className="text-sm font-medium text-muted-foreground">Weight</label>
+                        <p className="text-lg">{selectedProduct.weight}g</p>
                       </div>
+                      {selectedProduct.quantity && (
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Quantity</label>
+                          <p className="text-lg">{selectedProduct.quantity}</p>
+                        </div>
+                      )}
                       <div>
                         <label className="text-sm font-medium text-muted-foreground">Price</label>
                         <p className="text-lg">₹{selectedProduct.price}</p>

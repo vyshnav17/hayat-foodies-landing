@@ -13,7 +13,7 @@ const defaultProducts = [
     description: "Soft, fresh chapati made daily with premium ingredients",
     images: ["/assets/chapati.jpg", "/assets/bread.jpg", "/assets/rusk.jpg"],
     ingredients: ["Whole wheat flour", "Water", "Salt", "Oil"],
-    weight: 150,
+    weight: 450,
     price: 60,
   },
   {
@@ -49,7 +49,7 @@ const defaultProducts = [
     description: "Fresh, soft bread baked to perfection every day",
     images: ["/assets/bread.jpg", "/assets/chapati.jpg", "/assets/rusk.jpg"],
     ingredients: ["Flour", "Water", "Yeast", "Salt", "Sugar"],
-    weight: 120,
+    weight: 300,
     price: 40,
   },
   {

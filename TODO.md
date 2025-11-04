@@ -2,4 +2,4 @@
 - [x] Update src/components/Products.tsx: Change 'calories' to 'weight', update rusk price and weight, change display from 'kcal' to 'gm'
 - [x] Commit and push changes to make visible on hosted website
 - [x] Optimize animations in Products.tsx to reduce scroll lag by simplifying hover effects and stagger animations
-- [ ] Update product weights: Chapati 450gm, Bread 300gm, Rusk 250gm; change buns to quantity: Cream Bun 4 pieces, Normal Buns 2 pieces, Baby Chocolate Bun 5 pieces
+- [x] Update product weights: Chapati 450gm, Bread 300gm, Rusk 250gm; change buns to quantity: Cream Bun 4 pieces, Normal Buns 2 pieces, Baby Chocolate Bun 5 pieces
