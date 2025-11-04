@@ -1,3 +1,4 @@
 - [x] Update api/products.js: Change 'calories' to 'weight' for all products, set rusk price to 45 and weight to 250
 - [x] Update src/components/Products.tsx: Change 'calories' to 'weight', update rusk price and weight, change display from 'kcal' to 'gm'
-- [ ] Commit and push changes to make visible on hosted website
+- [x] Commit and push changes to make visible on hosted website
+- [ ] Optimize animations in Products.tsx to reduce scroll lag by simplifying hover effects and stagger animations
