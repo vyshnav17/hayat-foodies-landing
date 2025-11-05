@@ -263,7 +263,7 @@ const Navbar = () => {
                     <div className="flex space-x-4">
                       <Button
                         variant="outline"
-                        className="flex-1 px-4 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
+                        className="flex-1 px-6 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
                         onClick={() => window.open('https://wa.me/918111928999', '_blank')}
                       >
                         <img
@@ -275,7 +275,7 @@ const Navbar = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        className="flex-1 px-4 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
+                        className="flex-1 px-6 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
                         onClick={() => window.open('https://www.instagram.com/hayatfoodsindia/', '_blank')}
                       >
                         <Instagram className="h-4 w-4 mr-2 transition-transform duration-300 ease-in-out" />
@@ -283,7 +283,7 @@ const Navbar = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        className="flex-1 px-4 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
+                        className="flex-1 px-6 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
                         onClick={() => window.open('https://www.facebook.com/hayatfoodsindia/', '_blank')}
                       >
                         <Facebook className="h-4 w-4 mr-2 transition-transform duration-300 ease-in-out" />
