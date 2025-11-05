@@ -263,7 +263,6 @@ const Navbar = () => {
                     <div className="flex space-x-4">
                       <Button
                         variant="outline"
-                        size="icon"
                         className="flex-1 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
                         onClick={() => window.open('https://wa.me/918111928999', '_blank')}
                       >
@@ -276,7 +275,6 @@ const Navbar = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        size="icon"
                         className="flex-1 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
                         onClick={() => window.open('https://www.instagram.com/hayatfoodsindia/', '_blank')}
                       >
@@ -285,7 +283,6 @@ const Navbar = () => {
                       </Button>
                       <Button
                         variant="outline"
-                        size="icon"
                         className="flex-1 hover:bg-terracotta hover:text-white transition-all duration-300 ease-in-out hover:scale-105 transform"
                         onClick={() => window.open('https://www.facebook.com/hayatfoodsindia/', '_blank')}
                       >
