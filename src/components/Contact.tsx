@@ -113,19 +113,7 @@ const Contact = () => {
     }
   };
 
-  const contactItemVariants = {
-    hidden: { opacity: 0, y: 30, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: "spring" as const,
-        stiffness: 100,
-        damping: 15
-      }
-    }
-  };
+
 
   const formVariants = {
     hidden: { opacity: 0, x: 50 },
@@ -181,54 +169,24 @@ const Contact = () => {
                 className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6"
                 variants={contactInfoVariants}
               >
-                <motion.div
-                  variants={contactItemVariants}
-                  whileHover={{
-                    scale: 1.05,
-                    rotate: 2,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  <motion.div
-                    className="inline-flex items-center justify-center w-12 md:w-14 h-12 md:h-14 rounded-full bg-primary-foreground/10 mb-4"
-                    whileHover={{
-                      scale: 1.1,
-                      rotate: 5,
-                      backgroundColor: "rgba(255, 255, 255, 0.15)"
-                    }}
-                    transition={{ duration: 0.3 }}
-                  >
+                <div>
+                  <div className="inline-flex items-center justify-center w-12 md:w-14 h-12 md:h-14 rounded-full bg-primary-foreground/10 mb-4">
                     <Phone className="w-5 md:w-6 h-5 md:h-6" />
-                  </motion.div>
+                  </div>
                   <h3 className="font-semibold mb-2">Phone</h3>
                   <p className="opacity-90 text-sm md:text-base">Contact us for inquiries</p>
                   <div className="opacity-90 text-sm md:text-base space-y-1">
                     {isMobile ? (
                       <>
-                        <motion.a
-                          href="tel:+919988636383"
-                          className="hover:underline"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
+                        <a href="tel:+919988636383" className="hover:underline">
                           +91 9988636383
-                        </motion.a><br></br>
-                        <motion.a
-                          href="tel:+918592056057"
-                          className="hover:underline"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
+                        </a><br></br>
+                        <a href="tel:+918592056057" className="hover:underline">
                           +91 8592056057
-                        </motion.a><br></br>
-                        <motion.a
-                          href="tel:+918111928999"
-                          className="hover:underline"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
+                        </a><br></br>
+                        <a href="tel:+918111928999" className="hover:underline">
                           +91 81119 28999
-                        </motion.a>
+                        </a>
                       </>
                     ) : (
                       <>
@@ -238,53 +196,23 @@ const Contact = () => {
                       </>
                     )}
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  variants={contactItemVariants}
-                  whileHover={{
-                    scale: 1.05,
-                    rotate: -2,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  <motion.div
-                    className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 mb-4"
-                    whileHover={{
-                      scale: 1.1,
-                      rotate: -5,
-                      backgroundColor: "rgba(255, 255, 255, 0.15)"
-                    }}
-                    transition={{ duration: 0.3 }}
-                  >
+                <div>
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 mb-4">
                     <Mail className="w-6 h-6" />
-                  </motion.div>
+                  </div>
                   <h3 className="font-semibold mb-2">Email</h3>
                   <p className="opacity-90">hayatfoodsindia<br></br>@info.com</p>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  className="col-span-2"
-                  variants={contactItemVariants}
-                  whileHover={{
-                    scale: 1.02,
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                  <motion.div
-                    className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 mb-4"
-                    whileHover={{
-                      scale: 1.1,
-                      rotate: 3,
-                      backgroundColor: "rgba(255, 255, 255, 0.15)"
-                    }}
-                    transition={{ duration: 0.3 }}
-                  >
+                <div className="col-span-2">
+                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary-foreground/10 mb-4">
                     <MapPin className="w-6 h-6" />
-                  </motion.div>
+                  </div>
                   <h3 className="font-semibold mb-2">Location</h3>
                   <p className="opacity-90">Kannur, Kerala, India</p>
-                </motion.div>
+                </div>
               </motion.div>
 
               <motion.div
