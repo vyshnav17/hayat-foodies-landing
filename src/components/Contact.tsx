@@ -210,7 +210,14 @@ const Contact = () => {
                     <MapPin className="w-6 h-6" />
                   </div>
                   <h3 className="font-semibold mb-2">Location</h3>
-                  <p className="opacity-90">Kannur, Kerala, India</p>
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Hayat+Foods+India%2C+X8CH%2BM4G%2C+Hayat+Foods+Parapuram%2CK+Kannapuram+Kalliasseri%2CP.O+Mottammal%2C+Kerala+670331"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="opacity-90 hover:opacity-100 hover:underline transition-opacity"
+                  >
+                    Kannur, Kerala, India
+                  </a>
                 </div>
               </div>
 

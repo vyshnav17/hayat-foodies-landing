@@ -110,7 +110,7 @@ const Availability = () => {
                       Manufacturing Unit
                     </motion.h3>
                     <motion.p
-                      className="text-muted-foreground"
+                      className="text-muted-foreground mb-4"
                       initial={{ opacity: 0, y: 10 }}
                       animate={gridVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                       transition={{ delay: 0.4 }}
@@ -118,6 +118,28 @@ const Availability = () => {
                       Our modern manufacturing facility is located in Kannur, Kerala, where we produce
                       all our fresh bakery products daily.
                     </motion.p>
+                    <motion.div
+                      className="rounded-lg overflow-hidden border border-border cursor-pointer"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={gridVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+                      transition={{ delay: 0.5 }}
+                      onClick={() => {
+                        const address = encodeURIComponent("Hayat Foods India, X8CH+M4G, Hayat Foods Parapuram,K Kannapuram Kalliasseri,P.O Mottammal, Kerala 670331");
+                        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${address}`;
+                        window.open(googleMapsUrl, '_blank');
+                      }}
+                    >
+                      <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916!2d75.3704!3d11.8745!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0:0x0!2zMTEuODc0NSw3NS4zNzA0!5e0!3m2!1sen!2sin!4v123456789!5m2!1sen!2sin&q=X8CH%2BM4G%2C+Hayat+Foods+Parapuram%2CK+Kannapuram+Kalliasseri%2CP.O+Mottammal%2C+Kerala+670331"
+                        width="100%"
+                        height="200"
+                        style={{ border: 0 }}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                        title="Hayat Foods Manufacturing Unit Location"
+                      ></iframe>
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>
@@ -166,7 +188,7 @@ const Availability = () => {
                       Delivery Coverage
                     </motion.h3>
                     <motion.p
-                      className="text-muted-foreground"
+                      className="text-muted-foreground mb-3"
                       initial={{ opacity: 0, y: 10 }}
                       animate={gridVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                       transition={{ delay: 0.6 }}
@@ -174,6 +196,29 @@ const Availability = () => {
                       We deliver fresh products throughout the Kannur district. Available at select
                       retail outlets and stores near you.
                     </motion.p>
+                    <motion.div
+                      className="space-y-2"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={gridVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                      transition={{ delay: 0.7 }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-accent rounded-full"></div>
+                        <span className="text-sm text-muted-foreground">Same-day delivery within Kannur city</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-accent rounded-full"></div>
+                        <span className="text-sm text-muted-foreground">Next-day delivery to surrounding areas</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-accent rounded-full"></div>
+                        <span className="text-sm text-muted-foreground">Bulk orders available for events and celebrations</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-accent rounded-full"></div>
+                        <span className="text-sm text-muted-foreground">Minimum order value: ₹500</span>
+                      </div>
+                    </motion.div>
                   </div>
                 </div>
               </motion.div>

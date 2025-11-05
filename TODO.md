@@ -1,5 +1,5 @@
-- [x] Update api/products.js: Change 'calories' to 'weight' for all products, set rusk price to 45 and weight to 250
-- [x] Update src/components/Products.tsx: Change 'calories' to 'weight', update rusk price and weight, change display from 'kcal' to 'gm'
-- [x] Commit and push changes to make visible on hosted website
-- [x] Optimize animations in Products.tsx to reduce scroll lag by simplifying hover effects and stagger animations
-- [x] Update product weights: Chapati 450gm, Bread 300gm, Rusk 250gm; change buns to quantity: Cream Bun 4 pieces, Normal Buns 2 pieces, Baby Chocolate Bun 5 pieces
+# TODO List for Creating Distributor Modal
+
+- [x] Create DistributorModal.tsx component with popup functionality
+- [x] Integrate modal into Index.tsx page
+- [x] Test the modal functionality (Dev server running at http://localhost:8080/)
