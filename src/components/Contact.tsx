@@ -165,9 +165,8 @@ const Contact = () => {
               initial="hidden"
               animate={contactInfoVisible ? "visible" : "hidden"}
             >
-              <motion.div
+              <div
                 className="grid grid-cols-2 md:grid-cols-2 gap-4 md:gap-6"
-                variants={contactInfoVariants}
               >
                 <div>
                   <div className="inline-flex items-center justify-center w-12 md:w-14 h-12 md:h-14 rounded-full bg-primary-foreground/10 mb-4">
@@ -213,10 +212,9 @@ const Contact = () => {
                   <h3 className="font-semibold mb-2">Location</h3>
                   <p className="opacity-90">Kannur, Kerala, India</p>
                 </div>
-              </motion.div>
+              </div>
 
               <motion.div
-                variants={contactItemVariants}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
