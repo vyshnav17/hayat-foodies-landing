@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ interface Message {
 }
 
 const Chatbot = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -42,9 +44,46 @@ const Chatbot = () => {
       return "You can reach us at:\n📞 Phone: +91 98765 43210\n📧 Email: info@hayatfoods.com\n📍 Address: Kannur, Kerala\n\nWe also have WhatsApp ordering available!";
     }
 
+    // Individual product details
+    if (message.includes("chapati")) {
+      // Scroll to products section and open chapati modal
+      setTimeout(() => {
+        const productsSection = document.getElementById("products");
+        if (productsSection) {
+          productsSection.scrollIntoView({ behavior: "smooth" });
+          // Trigger click on chapati card
+          const chapatiCard = productsSection.querySelector('[data-product="chapati"]') as HTMLElement;
+          if (chapatiCard) {
+            chapatiCard.click();
+          }
+        }
+      }, 1000);
+      return "🍞 Chapati Details:\n• Price: ₹60 (₹66 including GST)\n• Weight: 450g\n• Description: Soft, fresh chapati made daily with premium ingredients\n• Ingredients: Whole wheat flour, Water, Salt, Oil\n• GST: ₹6\n\nPerfect for traditional meals and pairs wonderfully with curries!\n\nI've opened the chapati product details for you to see the images!";
+    }
+
+    if (message.includes("cream bun") || message.includes("cream")) {
+      return "🥐 Cream Bun Details:\n• Price: ₹45 (₹49.50 including GST)\n• Quantity: 4 pieces\n• Description: Delicious cream-filled buns with smooth vanilla cream\n• Ingredients: Flour, Cream, Sugar, Yeast, Vanilla\n• GST: ₹4.50\n\nA creamy delight that's perfect for any time of day!";
+    }
+
+    if (message.includes("normal bun") || message.includes("bun") && !message.includes("chocolate") && !message.includes("cream")) {
+      return "🍩 Normal Buns Details:\n• Price: ₹20 (₹22 including GST)\n• Quantity: 2 pieces\n• Description: Freshly baked, delightfully soft—your perfect companion for any meal\n• Ingredients: Flour, Sugar, Yeast, Milk, Butter\n• GST: ₹2\n\nSimple, soft, and utterly delicious!";
+    }
+
+    if (message.includes("baby chocolate") || message.includes("chocolate bun")) {
+      return "🧁 Baby Chocolate Bun Details:\n• Price: ₹40 (₹44 including GST)\n• Quantity: 5 pieces\n• Description: Soft, rich, and perfectly sized for a satisfying chocolate treat\n• Ingredients: Flour, Chocolate, Sugar, Yeast, Butter\n• GST: ₹4\n\nIndulge in these bite-sized chocolate wonders!";
+    }
+
+    if (message.includes("bread")) {
+      return "🍞 Bread Details:\n• Price: ₹40 (₹44 including GST)\n• Weight: 300g\n• Description: Fresh, soft bread baked to perfection every day\n• Ingredients: Flour, Water, Yeast, Salt, Sugar\n• GST: ₹4\n\nVersatile and perfect for sandwiches or toast!";
+    }
+
+    if (message.includes("rusk")) {
+      return "🥨 Rusk Details:\n• Price: ₹45 (₹49.50 including GST)\n• Weight: 250g\n• Description: Crispy, golden rusk perfect for tea time\n• Ingredients: Flour, Sugar, Butter, Eggs, Yeast\n• GST: ₹4.50\n\nThe perfect crunchy companion for your tea or coffee!";
+    }
+
     // Products
-    if (message.includes("product") || message.includes("bread") || message.includes("bun") || message.includes("chapati")) {
-      return "We offer fresh bakery products including:\n🍞 Bread (₹40)\n🥖 Chapati (₹20)\n🥐 Cream Buns (₹30)\n🍩 Chocolate Buns (₹25)\n🧁 Baby Chocolate Buns (₹15)\n🥨 Rusk (₹35)\n\nAll products are freshly baked daily!";
+    if (message.includes("product") || message.includes("bread") || message.includes("bun") || message.includes("chapati") || message.includes("rusk")) {
+      return "We offer fresh bakery products including:\n🍞 Bread (₹40) - Fresh, soft bread baked to perfection\n🥖 Chapati (₹60) - Soft, fresh chapati made daily with premium ingredients\n🥐 Cream Bun (₹45) - Delicious cream-filled buns with smooth vanilla cream\n🍩 Normal Buns (₹20) - Freshly baked, delightfully soft buns\n🧁 Baby Chocolate Bun (₹40) - Soft, rich chocolate treat perfectly sized\n🥨 Rusk (₹45) - Crispy, golden rusk perfect for tea time\n\nAll products are freshly baked daily with premium ingredients!\n\nAsk about any specific product for detailed information!";
     }
 
     // Delivery
@@ -64,12 +103,67 @@ const Chatbot = () => {
 
     // Pricing
     if (message.includes("price") || message.includes("cost") || message.includes("rate")) {
-      return "Our pricing includes GST:\n🍞 Bread: ₹44 (₹40 + ₹4 GST)\n🥖 Chapati: ₹22 (₹20 + ₹2 GST)\n🥐 Cream Buns: ₹33 (₹30 + ₹3 GST)\n🍩 Normal Buns: ₹27.50 (₹25 + ₹2.50 GST)\n🧁 Baby Chocolate Buns: ₹16.50 (₹15 + ₹1.50 GST)\n🥨 Rusk: ₹38.50 (₹35 + ₹3.50 GST)";
+      return "Our pricing includes GST:\n🍞 Bread: ₹44 (₹40 + ₹4 GST)\n🥖 Chapati: ₹66 (₹60 + ₹6 GST)\n🥐 Cream Bun: ₹49.50 (₹45 + ₹4.50 GST)\n🍩 Normal Buns: ₹22 (₹20 + ₹2 GST)\n🧁 Baby Chocolate Bun: ₹44 (₹40 + ₹4 GST)\n🥨 Rusk: ₹49.50 (₹45 + ₹4.50 GST)\n\nPrices may vary slightly based on quantity and location.";
     }
 
     // Ingredients
     if (message.includes("ingredient") || message.includes("made") || message.includes("quality")) {
-      return "All our products use premium ingredients:\n• Fresh flour and yeast\n• Pure butter and cream\n• Natural flavors and colors\n• No artificial preservatives\n• Traditional recipes with modern techniques";
+      return "All our products use premium ingredients:\n• Fresh flour and yeast\n• Pure butter and cream\n• Natural flavors and colors\n• No artificial preservatives\n• Traditional recipes with modern techniques\n\nEach product has specific ingredients - ask about a particular item for details!";
+    }
+
+    // Health benefits
+    if (message.includes("health") || message.includes("nutrition") || message.includes("diet") || message.includes("healthy")) {
+      return "Our products are made with natural ingredients and traditional methods:\n• Fresh daily baking ensures maximum freshness\n• No artificial preservatives or colors\n• High-quality ingredients for better nutrition\n• Perfect for breakfast, snacks, or meals\n\nWe recommend consuming in moderation as part of a balanced diet!";
+    }
+
+    // Ordering
+    if (message.includes("how to order") || message.includes("place order") || message.includes("buy")) {
+      return "Easy ways to order from Hayat Foods:\n📞 Call us: +91 98765 43210\n💬 WhatsApp: Send your order details\n🚚 Home delivery available\n🏪 Visit our retail outlets\n\nMinimum order: ₹100 for delivery\nBulk orders welcome for events!";
+    }
+
+    // Customization
+    if (message.includes("custom") || message.includes("special") || message.includes("bulk")) {
+      return "We offer customization options:\n• Bulk orders for events and celebrations\n• Special packaging for gifts\n• Custom quantities available\n• Event catering services\n\nContact us for special requirements and pricing!";
+    }
+
+    // Freshness
+    if (message.includes("fresh") || message.includes("freshness") || message.includes("baked")) {
+      return "Freshness is our priority! ✨\n• Baked fresh every morning\n• Delivered same day\n• No day-old products\n• State-of-the-art manufacturing\n• Quality control at every step\n\nThat's why our customers love Hayat Foods!";
+    }
+
+    // Recommendations
+    if (message.includes("recommend") || message.includes("suggest") || message.includes("best")) {
+      return "Our customer favorites:\n🥇 Cream Bun - Rich and creamy delight\n🥈 Baby Chocolate Bun - Perfect bite-sized treat\n🥉 Bread - Versatile for any meal\n\nTry our combo packs for the best experience! What's your occasion?";
+    }
+
+    // Opening hours
+    if (message.includes("time") || message.includes("open") || message.includes("close") || message.includes("hour")) {
+      return "Our operating hours:\n🏭 Manufacturing: 5 AM - 6 PM daily\n🚚 Delivery: 7 AM - 8 PM daily\n📞 Phone support: 8 AM - 8 PM\n💬 WhatsApp: 24/7 for orders\n\nWe're here to serve you fresh!";
+    }
+
+    // Special occasions
+    if (message.includes("birthday") || message.includes("party") || message.includes("celebration") || message.includes("event")) {
+      return "Special occasions call for special treats! 🎉\n• Birthday cakes and custom decorations\n• Party packs with assorted buns\n• Bulk orders for celebrations\n• Gift packaging available\n\nLet us make your special day even sweeter!";
+    }
+
+    // Customer service
+    if (message.includes("complaint") || message.includes("issue") || message.includes("problem") || message.includes("feedback")) {
+      return "We're sorry to hear that! 😔\nYour feedback is important to us. Please contact our customer service:\n📞 +91 98765 43210\n📧 info@hayatfoods.com\n\nWe strive to provide the best quality and service!";
+    }
+
+    // Loyalty/Repeat customers
+    if (message.includes("regular") || message.includes("daily") || message.includes("subscription") || message.includes("loyal")) {
+      return "We love our regular customers! 💝\n• Special discounts for daily orders\n• Priority delivery service\n• Custom order preferences\n• Loyalty rewards program\n\nContact us to set up your regular delivery schedule!";
+    }
+
+    // Fun responses
+    if (message.includes("joke") || message.includes("funny") || message.includes("laugh")) {
+      return "Why did the baker go to therapy? 🤪\nBecause he kneaded help with his dough-pression! 🍞\n\nNeed help with anything else? We're here to make your day better!";
+    }
+
+    // Weather/food suggestions
+    if (message.includes("weather") || message.includes("rain") || message.includes("hot") || message.includes("cold")) {
+      return "Weather-appropriate suggestions:\n🌧️ Rainy day: Warm bread with tea\n☀️ Hot day: Cool cream buns\n❄️ Cold day: Fresh chapati with curry\n\nStay comfortable and enjoy our fresh products!";
     }
 
     // Default responses
@@ -82,7 +176,7 @@ const Chatbot = () => {
     }
 
     // Fallback
-    return "I'd be happy to help you with information about Hayat Foods! You can ask me about our products, contact details, delivery information, pricing, or anything else related to our bakery services.";
+    return "I'd be happy to help you with information about Hayat Foods! You can ask me about our products, contact details, delivery information, pricing, health benefits, recommendations, or anything else related to our bakery services. What would you like to know?";
   };
 
   const handleSendMessage = async () => {

@@ -199,6 +199,7 @@ const Products = () => {
             >
               <Card
                 className="group overflow-hidden border-border hover:shadow-2xl transition-all duration-500 transform cursor-pointer h-full"
+                data-product={product.name.toLowerCase().replace(' ', '-')}
                 onClick={() => {
                   setSelectedProduct(product);
                   setDialogOpen(true);
