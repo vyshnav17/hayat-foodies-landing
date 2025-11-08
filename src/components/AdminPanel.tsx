@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Trash2, Eye, Download, LogOut, CheckCircle, Plus, Edit, Save } from "lucide-react";
+import { Trash2, Eye, Download, LogOut, CheckCircle, Plus, Edit, Save, Upload, Image as ImageIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import chapatiImg from "@/assets/chapati.jpg";
 import creamBunImg from "@/assets/cream-bun.jpg";
@@ -38,6 +38,14 @@ interface Product {
   gst?: number;
 }
 
+interface GalleryImage {
+  id: string;
+  src: string;
+  alt: string;
+  uploadedAt: string;
+  uploadedBy: string;
+}
+
 interface AdminPanelProps {
   onLogout: () => void;
 }
@@ -59,6 +67,13 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     quantity: '',
     price: '',
     gst: ''
+  });
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [selectedGalleryImage, setSelectedGalleryImage] = useState<GalleryImage | null>(null);
+  const [isGalleryDialogOpen, setIsGalleryDialogOpen] = useState(false);
+  const [galleryForm, setGalleryForm] = useState({
+    image: null as File | null,
+    alt: ''
   });
 
   const defaultProducts = [
@@ -130,6 +145,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
 
     // Load products from API, fallback to defaultProducts
     fetchProducts();
+
+    // Load gallery images from API
+    fetchGalleryImages();
   }, []);
 
   const fetchContactSubmissions = async () => {
@@ -177,6 +195,20 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       console.error('Error fetching products:', error);
       // Fallback to default products
       setProducts(defaultProducts);
+    }
+  };
+
+  const fetchGalleryImages = async () => {
+    try {
+      const response = await fetch('/api/gallery');
+      if (response.ok) {
+        const images = await response.json();
+        setGalleryImages(images);
+      } else {
+        console.error('Failed to fetch gallery images');
+      }
+    } catch (error) {
+      console.error('Error fetching gallery images:', error);
     }
   };
 
@@ -397,6 +429,86 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     }
   };
 
+  const handleGallerySubmit = async () => {
+    // Form validation
+    if (!galleryForm.image) {
+      alert('Please select an image file');
+      return;
+    }
+    if (!galleryForm.alt.trim()) {
+      alert('Alt text is required');
+      return;
+    }
+
+    // File validation
+    if (galleryForm.image.size > 5 * 1024 * 1024) { // 5MB limit
+      alert('File size must be less than 5MB');
+      return;
+    }
+    if (!galleryForm.image.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('image', galleryForm.image);
+      formData.append('alt', galleryForm.alt.trim());
+      formData.append('uploadedBy', 'Admin');
+
+      const response = await fetch('/api/gallery', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Upload successful:', result);
+
+        // Refresh gallery images from API
+        await fetchGalleryImages();
+
+        // Reset form
+        setGalleryForm({
+          image: null,
+          alt: ''
+        });
+        setIsGalleryDialogOpen(false);
+
+        alert('Gallery image uploaded successfully!');
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('API Error:', errorData);
+        alert(`Failed to upload gallery image: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error uploading gallery image:', error);
+      alert(`Failed to upload gallery image: ${error instanceof Error ? error.message : 'Network error'}`);
+    }
+  };
+
+  const deleteGalleryImage = async (id: string) => {
+    try {
+      const response = await fetch(`/api/gallery?id=${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        const updatedImages = galleryImages.filter(img => img.id !== id);
+        setGalleryImages(updatedImages);
+        if (selectedGalleryImage?.id === id) {
+          setSelectedGalleryImage(null);
+        }
+      } else {
+        console.error('Failed to delete gallery image');
+        alert('Failed to delete gallery image');
+      }
+    } catch (error) {
+      console.error('Error deleting gallery image:', error);
+      alert('Error deleting gallery image');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
@@ -411,9 +523,10 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         </div>
 
         <Tabs defaultValue="contact" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto p-1">
             <TabsTrigger value="contact" className="text-xs sm:text-sm py-2">Contact Submissions</TabsTrigger>
             <TabsTrigger value="products" className="text-xs sm:text-sm py-2">Product Management ({products.length})</TabsTrigger>
+            <TabsTrigger value="gallery" className="text-xs sm:text-sm py-2">Gallery Management</TabsTrigger>
           </TabsList>
 
           <TabsContent value="contact" className="space-y-4">
@@ -839,6 +952,142 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
             </div>
           </TabsContent>
 
+          <TabsContent value="gallery" className="space-y-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h2 className="text-xl md:text-2xl font-bold">Gallery Management</h2>
+              <Dialog open={isGalleryDialogOpen} onOpenChange={setIsGalleryDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => setIsGalleryDialogOpen(true)} className="flex items-center gap-2 w-full sm:w-auto">
+                    <Upload className="w-4 h-4" />
+                    Add Image
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md w-[95vw] p-4 md:p-6">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg md:text-xl">Add New Gallery Image</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="gallery-image">Image File</Label>
+                      <input
+                        id="gallery-image"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setGalleryForm({ ...galleryForm, image: e.target.files?.[0] || null })}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="gallery-alt">Alt Text</Label>
+                      <Input
+                        id="gallery-alt"
+                        value={galleryForm.alt}
+                        onChange={(e) => setGalleryForm({ ...galleryForm, alt: e.target.value })}
+                        placeholder="Description of the image"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                    <Button variant="outline" onClick={() => setIsGalleryDialogOpen(false)} className="w-full sm:w-auto">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleGallerySubmit} className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                      <Save className="w-4 h-4" />
+                      Add Image
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
+              {/* Gallery Images List */}
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Gallery Images ({galleryImages.length})</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {galleryImages.length === 0 ? (
+                      <p className="text-muted-foreground text-center py-8">
+                        No gallery images available
+                      </p>
+                    ) : (
+                      galleryImages.map((image) => (
+                        <div
+                          key={image.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 cursor-pointer"
+                          onClick={() => setSelectedGalleryImage(image)}
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            <img
+                              src={image.src}
+                              alt={image.alt}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold truncate">{image.alt}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {new Date(image.uploadedAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteGalleryImage(image.id);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Gallery Image Details */}
+              <div>
+                {selectedGalleryImage ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Image Details</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex justify-center">
+                        <img
+                          src={selectedGalleryImage.src}
+                          alt={selectedGalleryImage.alt}
+                          className="max-w-full h-auto max-h-64 object-contain rounded"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Alt Text</label>
+                        <p className="text-lg">{selectedGalleryImage.alt}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Uploaded At</label>
+                        <p className="text-lg">{new Date(selectedGalleryImage.uploadedAt).toLocaleString()}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Uploaded By</label>
+                        <p className="text-lg">{selectedGalleryImage.uploadedBy}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card>
+                    <CardContent className="flex items-center justify-center h-64">
+                      <p className="text-muted-foreground">Select an image to view details</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
 
         </Tabs>
       </div>
