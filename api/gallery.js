@@ -96,43 +96,60 @@ function uploadMiddleware(req, res) {
 }
 
 async function handler(req, res) {
+  console.log('Gallery API called with method:', req.method);
+
   try {
     switch (req.method) {
       case 'GET':
+        console.log('Returning default gallery images');
         // Return default gallery images since Firebase is removed
         res.status(200).json(defaultGalleryImages);
         break;
 
       case 'POST':
+        console.log('Processing file upload');
+
         // Handle file upload
         try {
           await uploadMiddleware(req, res);
+          console.log('Upload middleware passed');
         } catch (uploadError) {
-          console.error('Upload error:', uploadError);
+          console.error('Upload middleware error:', uploadError);
           return res.status(400).json({ error: uploadError.message || 'File upload failed' });
         }
 
         // Check if file was uploaded
         if (!req.file) {
+          console.error('No file provided');
           return res.status(400).json({ error: 'No image file provided' });
         }
 
+        console.log('File received:', req.file.originalname, 'Size:', req.file.size);
+
         // Upload to Vercel Blob
-        const blob = await put(`gallery/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
-          access: 'public',
-          contentType: req.file.mimetype,
-        });
+        try {
+          console.log('Uploading to Vercel Blob...');
+          const blob = await put(`gallery/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+            access: 'public',
+            contentType: req.file.mimetype,
+          });
+          console.log('Blob upload successful:', blob.url);
 
-        // Create image metadata
-        const newImage = {
-          id: Date.now().toString(),
-          src: blob.url,
-          alt: req.body.alt || req.file.originalname || "Uploaded Image",
-          uploadedAt: new Date().toISOString(),
-          uploadedBy: req.body.uploadedBy || "admin"
-        };
+          // Create image metadata
+          const newImage = {
+            id: Date.now().toString(),
+            src: blob.url,
+            alt: req.body.alt || req.file.originalname || "Uploaded Image",
+            uploadedAt: new Date().toISOString(),
+            uploadedBy: req.body.uploadedBy || "admin"
+          };
 
-        res.status(201).json({ message: 'Image uploaded successfully', image: newImage });
+          console.log('Returning success response');
+          res.status(201).json({ message: 'Image uploaded successfully', image: newImage });
+        } catch (blobError) {
+          console.error('Blob upload error:', blobError);
+          return res.status(500).json({ error: 'Failed to upload to storage' });
+        }
         break;
 
       case 'DELETE':
@@ -146,7 +163,7 @@ async function handler(req, res) {
     }
   } catch (error) {
     console.error('API Error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message });
   }
 }
 
