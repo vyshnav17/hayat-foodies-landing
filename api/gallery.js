@@ -1,30 +1,14 @@
 import cors from 'cors';
+import { put } from '@vercel/blob';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 
 const corsHandler = cors({
   origin: true,
   credentials: true
 });
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'public', 'assets', 'gallery');
-    // Ensure directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const extension = path.extname(file.originalname);
-    cb(null, 'uploaded-' + uniqueSuffix + extension);
-  }
-});
+// Configure multer for memory storage (for Vercel Blob)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage: storage,
@@ -133,11 +117,16 @@ async function handler(req, res) {
           return res.status(400).json({ error: 'No image file provided' });
         }
 
+        // Upload to Vercel Blob
+        const blob = await put(`gallery/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+          access: 'public',
+          contentType: req.file.mimetype,
+        });
+
         // Create image metadata
-        const imagePath = `/assets/gallery/${req.file.filename}`;
         const newImage = {
           id: Date.now().toString(),
-          src: imagePath,
+          src: blob.url,
           alt: req.body.alt || req.file.originalname || "Uploaded Image",
           uploadedAt: new Date().toISOString(),
           uploadedBy: req.body.uploadedBy || "admin"
