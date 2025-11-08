@@ -4,12 +4,12 @@ import Contact from "@/components/Contact";
 
 const Gallery = () => {
   const galleryImages = [
-    { src: "/src/assets/gallery/baby-chocolate-bun.jpg", alt: "Baby Chocolate Bun" },
-    { src: "/src/assets/gallery/bread.jpg", alt: "Fresh Bread" },
-    { src: "/src/assets/gallery/chapati.jpg", alt: "Chapati" },
-    { src: "/src/assets/gallery/chocolate-bun.jpg", alt: "Chocolate Bun" },
-    { src: "/src/assets/gallery/cream-bun.jpg", alt: "Cream Bun" },
-    { src: "/src/assets/gallery/hero-bread.jpg", alt: "Hero Bread" },
+    { src: "/assets/gallery/baby-chocolate-bun.jpg", alt: "Baby Chocolate Bun" },
+    { src: "/assets/gallery/bread.jpg", alt: "Fresh Bread" },
+    { src: "/assets/gallery/chapati.jpg", alt: "Chapati" },
+    { src: "/assets/gallery/chocolate-bun.jpg", alt: "Chocolate Bun" },
+    { src: "/assets/gallery/cream-bun.jpg", alt: "Cream Bun" },
+    { src: "/assets/gallery/hero-bread.jpg", alt: "Hero Bread" },
   ];
 
   return (
