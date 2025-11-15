@@ -456,17 +456,18 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       formData.append('alt', galleryForm.alt.trim());
       formData.append('uploadedBy', 'Admin');
 
+      console.log('Starting upload...');
       const response = await fetch('/api/gallery', {
         method: 'POST',
         body: formData
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Upload successful:', result);
+      console.log('Response status:', response.status);
+      const result = await response.json();
+      console.log('Response data:', result);
 
-        // Refresh gallery images from API
-        await fetchGalleryImages();
+      if (response.ok) {
+        console.log('Upload successful:', result);
 
         // Reset form
         setGalleryForm({
@@ -475,11 +476,13 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         });
         setIsGalleryDialogOpen(false);
 
-        alert('Gallery image uploaded successfully!');
+        // Refresh gallery images from API
+        await fetchGalleryImages();
+
+        alert('Gallery image uploaded successfully! It will now be visible in the gallery.');
       } else {
-        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-        console.error('API Error:', errorData);
-        alert(`Failed to upload gallery image: ${errorData.error || 'Unknown error'}`);
+        console.error('API Error:', result);
+        alert(`Failed to upload gallery image: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error uploading gallery image:', error);
@@ -494,11 +497,12 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
       });
 
       if (response.ok) {
-        const updatedImages = galleryImages.filter(img => img.id !== id);
-        setGalleryImages(updatedImages);
+        // Refresh gallery images from API
+        await fetchGalleryImages();
         if (selectedGalleryImage?.id === id) {
           setSelectedGalleryImage(null);
         }
+        alert('Gallery image deleted successfully!');
       } else {
         console.error('Failed to delete gallery image');
         alert('Failed to delete gallery image');
