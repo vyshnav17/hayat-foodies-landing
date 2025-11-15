@@ -1,12 +1,14 @@
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
 
-// Try to import Vercel KV, fallback to localStorage if not available
+// Try to import Vercel KV, fallback to file system if not available
 let kv = null;
 try {
-  const kvModule = require('@vercel/kv');
+  const kvModule = await import('@vercel/kv');
   kv = kvModule.kv;
 } catch (error) {
-  console.log('Vercel KV not available, using localStorage fallback');
+  console.log('Vercel KV not available, using file system fallback');
 }
 
 const corsHandler = cors({
@@ -26,8 +28,6 @@ function wrapCors(handler) {
 }
 
 // Fallback storage using file system for local development
-const fs = require('fs');
-const path = require('path');
 
 const reviewsFilePath = path.join(process.cwd(), 'reviews.json');
 
@@ -66,7 +66,15 @@ async function handler(req, res) {
       case 'GET':
         // Get reviews from storage (KV or fallback)
         const reviewsData = await storage.get('customerReviews');
-        const reviews = reviewsData ? JSON.parse(reviewsData) : [];
+        let reviews = [];
+        if (reviewsData) {
+          try {
+            reviews = JSON.parse(reviewsData);
+          } catch (error) {
+            console.error('Error parsing reviews data:', error);
+            reviews = [];
+          }
+        }
         console.log(`Retrieved ${reviews.length} reviews from ${kv ? 'Vercel KV' : 'fallback storage'}`);
         res.status(200).json(reviews);
         break;
@@ -86,7 +94,15 @@ async function handler(req, res) {
 
         // Get existing reviews
         const existingReviewsData = await storage.get('customerReviews');
-        const existingReviews = existingReviewsData ? JSON.parse(existingReviewsData) : [];
+        let existingReviews = [];
+        if (existingReviewsData) {
+          try {
+            existingReviews = JSON.parse(existingReviewsData);
+          } catch (error) {
+            console.error('Error parsing existing reviews data:', error);
+            existingReviews = [];
+          }
+        }
 
         // Create new review
         const newReview = {
