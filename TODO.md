@@ -7,7 +7,9 @@
 ## Tasks
 - [x] Modify upload logic in api/gallery.js to encode alt text into blob path
 - [x] Update retrieval logic in api/gallery.js to parse alt text from pathname
-- [ ] Test upload and verify alt text displays correctly in gallery
+- [x] Test upload and verify alt text displays correctly in gallery
+- [x] Commit changes to GitHub repository
+- [x] Add image popup modal feature when clicking gallery images
 
 ## Implementation Details
 - Encode alt text as slug (replace spaces with hyphens, remove special chars)
