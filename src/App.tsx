@@ -11,6 +11,7 @@ import ProductsPage from "./pages/Products";
 import AboutPage from "./pages/About";
 import AvailabilityPage from "./pages/Availability";
 import ContactPage from "./pages/Contact";
+import Reviews from "./pages/Reviews";
 import AdminPanel from "./components/AdminPanel";
 import Login from "./components/Login";
 import NotFound from "./pages/NotFound";
@@ -52,6 +53,7 @@ const App = () => {
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/availability" element={<AvailabilityPage />} />
+              <Route path="/reviews" element={<Reviews />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route
                 path="/admin"

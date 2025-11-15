@@ -1,17 +1,20 @@
-# TODO: Fix Gallery Alt Text Issue
+# TODO: Add Customer Reviews Feature
 
 ## Current Status
-- Image upload feature is working, but alt text is not visible in gallery
-- Alt text falls back to filename because Vercel Blob metadata isn't returned in list API
+- Gallery alt text issue has been fixed
+- New feature request: Customer reviews page with star ratings
 
 ## Tasks
-- [x] Modify upload logic in api/gallery.js to encode alt text into blob path
-- [x] Update retrieval logic in api/gallery.js to parse alt text from pathname
-- [x] Test upload and verify alt text displays correctly in gallery
-- [x] Commit changes to GitHub repository
-- [x] Add image popup modal feature when clicking gallery images
+- [x] Create Reviews page component with star rating form
+- [x] Create API endpoint for handling review submissions
+- [x] Add Reviews route to App.tsx
+- [x] Add Reviews navigation link to Navbar.tsx
+- [x] Implement star rating component
+- [x] Display submitted reviews publicly
+- [ ] Test review submission and display
 
 ## Implementation Details
-- Encode alt text as slug (replace spaces with hyphens, remove special chars)
-- Blob path format: `gallery/timestamp-altSlug-filename`
-- Parse alt text by splitting pathname and decoding slug
+- Star rating: 1-5 stars selection
+- Review form: name, email, rating, review text
+- Public display: show all submitted reviews
+- Storage: localStorage for now (can be upgraded to database later)

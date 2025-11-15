@@ -117,6 +117,14 @@ const Navbar = () => {
             </Link>
 
             <Link
+              to="/reviews"
+              className="text-brown hover:text-terracotta transition-all duration-300 ease-in-out font-medium relative group"
+            >
+              Reviews
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-terracotta transition-all duration-300 ease-in-out group-hover:w-full"></span>
+            </Link>
+
+            <Link
               to="/contact"
               className="text-brown hover:text-terracotta transition-all duration-300 ease-in-out font-medium relative group"
             >
@@ -214,6 +222,14 @@ const Navbar = () => {
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Gallery
+                    </Link>
+
+                    <Link
+                      to="/reviews"
+                      className="block w-full text-left text-brown hover:text-terracotta transition-all duration-300 ease-in-out font-medium py-2 hover:translate-x-2 transform"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Reviews
                     </Link>
 
                     <Link
