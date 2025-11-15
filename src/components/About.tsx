@@ -73,7 +73,7 @@ const About = () => {
             animate={titleVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Committed to excellence in every product we create
+            Hayat Foods is committed to excellence in every product we create
           </motion.p>
         </motion.div>
 

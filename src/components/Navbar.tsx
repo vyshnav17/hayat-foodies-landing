@@ -66,7 +66,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center">
               <img
                 src={logo}
-                alt="Hayat Foods Logo"
+                alt="Hayat Foods - Premium Bakery Products Logo"
                 className={`w-auto transition-all duration-500 ease-in-out ${
                   isScrolled ? 'h-16 md:h-20' : 'h-20 md:h-24'
                 } hover:scale-105 transform`}
@@ -170,7 +170,7 @@ const Navbar = () => {
               <SheetContent side="right" className="w-full sm:w-80 bg-white/95 backdrop-blur-md">
                 <SheetHeader>
                   <SheetTitle className="flex justify-center">
-                    <img src={logo} alt="Hayat Foods Logo" className="h-16 w-auto transition-transform duration-300 ease-in-out hover:scale-105" />
+                    <img src={logo} alt="Hayat Foods - Premium Bakery Products Logo" className="h-16 w-auto transition-transform duration-300 ease-in-out hover:scale-105" />
                   </SheetTitle>
                 </SheetHeader>
 

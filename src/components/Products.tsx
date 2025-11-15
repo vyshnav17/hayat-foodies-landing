@@ -167,7 +167,7 @@ const Products = () => {
             animate={titleVisible ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Our Premium Products
+            Hayat Foods Premium Products
           </motion.h2>
           <motion.p
             className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto"
@@ -175,7 +175,7 @@ const Products = () => {
             animate={titleVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Discover our range of freshly baked products, made with love and the finest ingredients
+            Discover Hayat Foods range of freshly baked products, made with love and the finest ingredients
           </motion.p>
         </motion.div>
 
@@ -208,7 +208,7 @@ const Products = () => {
                 <div className="relative h-64 overflow-hidden">
                   <motion.img
                     src={product.images[0]}
-                    alt={product.name}
+                    alt={`Hayat Foods ${product.name} - ${product.description}`}
                     className="w-full h-full object-cover"
                     whileHover={{
                       scale: 1.1,
@@ -291,7 +291,7 @@ const Products = () => {
                           <CarouselItem key={imgIndex}>
                             <img
                               src={image}
-                              alt={`${selectedProduct.name} ${imgIndex + 1}`}
+                              alt={`Hayat Foods ${selectedProduct.name} - Image ${imgIndex + 1}`}
                               className="w-full h-48 md:h-64 object-cover rounded-lg"
                             />
                           </CarouselItem>

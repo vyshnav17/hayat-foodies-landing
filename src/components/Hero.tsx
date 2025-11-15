@@ -39,7 +39,7 @@ const Hero = () => {
         <div className="max-w-4xl mx-auto text-center text-white">
           <motion.img
             src={logo}
-            alt="Hayat Foods Logo"
+            alt="Hayat Foods - Premium Bakery Products Logo"
             className="h-36 md:h-44 lg:h-56 mx-auto mb-6 md:mb-8 drop-shadow-2xl"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -57,11 +57,12 @@ const Hero = () => {
           />
 
           <TypographyAnimation
-            text="Hayat Foods India"
+            text="Hayat Foods"
             className="text-4xl md:text-5xl lg:text-7xl font-bold mb-4 md:mb-6 leading-tight"
             type="reveal"
             delay={0.5}
             duration={1}
+            as="h1"
           />
 
           <TextReveal
@@ -72,11 +73,12 @@ const Hero = () => {
           </TextReveal>
 
           <TypographyAnimation
-            text="Bringing Fresh, Quality Baked Goods to Kannur, Kerala"
+            text="Hayat Foods - Bringing Fresh, Quality Baked Goods to Kannur, Kerala"
             className="text-base md:text-lg lg:text-xl mb-6 md:mb-8 text-white/90"
             type="fade"
             delay={1.5}
             duration={0.8}
+            as="p"
           />
 
           <motion.div

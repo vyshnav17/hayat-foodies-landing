@@ -7,6 +7,7 @@ interface TypographyAnimationProps {
   delay?: number;
   duration?: number;
   type?: 'reveal' | 'typewriter' | 'fade' | 'slide';
+  as?: keyof JSX.IntrinsicElements;
 }
 
 export const TypographyAnimation = ({
@@ -14,7 +15,8 @@ export const TypographyAnimation = ({
   className = '',
   delay = 0,
   duration = 1,
-  type = 'reveal'
+  type = 'reveal',
+  as: Component = 'div'
 }: TypographyAnimationProps) => {
   const [displayText, setDisplayText] = useState('');
   const [isComplete, setIsComplete] = useState(false);
@@ -67,8 +69,10 @@ export const TypographyAnimation = ({
 
   const variants = getAnimationVariants();
 
+  const MotionComponent = motion(Component as any);
+
   return (
-    <motion.div
+    <MotionComponent
       className={`inline-block ${className}`}
       initial="hidden"
       animate="visible"
@@ -87,7 +91,7 @@ export const TypographyAnimation = ({
       ) : (
         text
       )}
-    </motion.div>
+    </MotionComponent>
   );
 };
 

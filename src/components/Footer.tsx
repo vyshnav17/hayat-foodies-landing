@@ -29,9 +29,9 @@ const Footer = () => {
 
           {/* Main Footer Content */}
           <div className="text-center space-y-4 md:space-y-6">
-            <h3 className="text-xl md:text-2xl font-bold">Hayat Foods India PVT. LTD</h3>
+            <h3 className="text-xl md:text-2xl font-bold">Hayat Foods</h3>
             <p className="text-sm opacity-90">
-              Premium Bakery Products | Kannur, Kerala, India
+              Hayat Foods - Premium Bakery Products | Kannur, Kerala, India
             </p>
 
             <div className="flex justify-center gap-6 pt-4">
