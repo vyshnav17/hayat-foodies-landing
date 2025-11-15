@@ -44,6 +44,7 @@ interface GalleryImage {
   alt: string;
   uploadedAt: string;
   uploadedBy: string;
+  pathname?: string; // Add pathname for blob storage
 }
 
 interface AdminPanelProps {
@@ -71,8 +72,13 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [selectedGalleryImage, setSelectedGalleryImage] = useState<GalleryImage | null>(null);
   const [isGalleryDialogOpen, setIsGalleryDialogOpen] = useState(false);
+  const [isEditGalleryDialogOpen, setIsEditGalleryDialogOpen] = useState(false);
+  const [editingGalleryImage, setEditingGalleryImage] = useState<GalleryImage | null>(null);
   const [galleryForm, setGalleryForm] = useState({
     image: null as File | null,
+    alt: ''
+  });
+  const [editGalleryForm, setEditGalleryForm] = useState({
     alt: ''
   });
 
@@ -487,6 +493,56 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     } catch (error) {
       console.error('Error uploading gallery image:', error);
       alert(`Failed to upload gallery image: ${error instanceof Error ? error.message : 'Network error'}`);
+    }
+  };
+
+  const editGalleryImage = (image: GalleryImage) => {
+    setEditingGalleryImage(image);
+    setEditGalleryForm({
+      alt: image.alt
+    });
+    setIsEditGalleryDialogOpen(true);
+  };
+
+  const handleEditGallerySubmit = async () => {
+    if (!editingGalleryImage) return;
+
+    // Form validation
+    if (!editGalleryForm.alt.trim()) {
+      alert('Alt text is required');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/gallery', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingGalleryImage.id,
+          alt: editGalleryForm.alt.trim()
+        })
+      });
+
+      if (response.ok) {
+        // Refresh gallery images from API
+        await fetchGalleryImages();
+
+        // Reset form
+        setEditGalleryForm({
+          alt: ''
+        });
+        setEditingGalleryImage(null);
+        setIsEditGalleryDialogOpen(false);
+
+        alert('Gallery image updated successfully!');
+      } else {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('API Error:', errorData);
+        alert(`Failed to update gallery image: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating gallery image:', error);
+      alert(`Failed to update gallery image: ${error instanceof Error ? error.message : 'Network error'}`);
     }
   };
 
@@ -1004,6 +1060,34 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                   </div>
                 </DialogContent>
               </Dialog>
+
+              <Dialog open={isEditGalleryDialogOpen} onOpenChange={setIsEditGalleryDialogOpen}>
+                <DialogContent className="max-w-md w-[95vw] p-4 md:p-6">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg md:text-xl">Edit Gallery Image</DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Label htmlFor="edit-gallery-alt">Alt Text</Label>
+                      <Input
+                        id="edit-gallery-alt"
+                        value={editGalleryForm.alt}
+                        onChange={(e) => setEditGalleryForm({ ...editGalleryForm, alt: e.target.value })}
+                        placeholder="Description of the image"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 mt-4">
+                    <Button variant="outline" onClick={() => setIsEditGalleryDialogOpen(false)} className="w-full sm:w-auto">
+                      Cancel
+                    </Button>
+                    <Button onClick={handleEditGallerySubmit} className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                      <Save className="w-4 h-4" />
+                      Update Image
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
@@ -1038,16 +1122,28 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                               </p>
                             </div>
                           </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteGalleryImage(image.id);
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                editGalleryImage(image);
+                              }}
+                            >
+                              <Edit className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteGalleryImage(image.id);
+                              }}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       ))
                     )}
