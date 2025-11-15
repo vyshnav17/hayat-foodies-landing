@@ -64,10 +64,32 @@ const Reviews = () => {
           const reviewsData = await response.json();
           setReviews(reviewsData);
         } else {
-          console.error('Failed to fetch reviews');
+          console.error('Failed to fetch reviews:', response.status, response.statusText);
+          // Fallback to localStorage if API fails
+          const savedReviews = localStorage.getItem('customerReviews');
+          if (savedReviews) {
+            try {
+              const parsedReviews = JSON.parse(savedReviews);
+              setReviews(parsedReviews);
+              console.log('Loaded reviews from localStorage fallback');
+            } catch (parseError) {
+              console.error('Error parsing localStorage reviews:', parseError);
+            }
+          }
         }
       } catch (error) {
         console.error('Error fetching reviews:', error);
+        // Fallback to localStorage if API fails
+        const savedReviews = localStorage.getItem('customerReviews');
+        if (savedReviews) {
+          try {
+            const parsedReviews = JSON.parse(savedReviews);
+            setReviews(parsedReviews);
+            console.log('Loaded reviews from localStorage fallback');
+          } catch (parseError) {
+            console.error('Error parsing localStorage reviews:', parseError);
+          }
+        }
       }
     };
 

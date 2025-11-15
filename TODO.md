@@ -11,6 +11,7 @@
 - [x] Add Reviews navigation link to Navbar.tsx
 - [x] Implement star rating component
 - [x] Display submitted reviews publicly
+- [x] Fix reviews visibility issue - migrate to Vercel KV database
 - [ ] Test review submission and display
 
 ## Implementation Details

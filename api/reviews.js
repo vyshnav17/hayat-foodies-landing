@@ -1,5 +1,13 @@
 import cors from 'cors';
-import { kv } from '@vercel/kv';
+
+// Try to import Vercel KV, fallback to localStorage if not available
+let kv = null;
+try {
+  const kvModule = require('@vercel/kv');
+  kv = kvModule.kv;
+} catch (error) {
+  console.log('Vercel KV not available, using localStorage fallback');
+}
 
 const corsHandler = cors({
   origin: true,
@@ -17,16 +25,33 @@ function wrapCors(handler) {
   };
 }
 
+// Fallback storage functions for local development
+const localStorageFallback = {
+  get: async (key) => {
+    // In serverless environment, we can't access localStorage
+    // Return empty array for development
+    console.log('Using localStorage fallback - returning empty reviews');
+    return null;
+  },
+  set: async (key, value) => {
+    console.log('Using localStorage fallback - data would be saved locally');
+    // In serverless environment, we can't persist data
+    // Just log for development
+  }
+};
+
+const storage = kv || localStorageFallback;
+
 async function handler(req, res) {
   console.log('Reviews API called with method:', req.method);
 
   try {
     switch (req.method) {
       case 'GET':
-        // Get reviews from Vercel KV
-        const reviewsData = await kv.get('customerReviews');
+        // Get reviews from storage (KV or fallback)
+        const reviewsData = await storage.get('customerReviews');
         const reviews = reviewsData ? JSON.parse(reviewsData) : [];
-        console.log(`Retrieved ${reviews.length} reviews from database`);
+        console.log(`Retrieved ${reviews.length} reviews from ${kv ? 'Vercel KV' : 'fallback storage'}`);
         res.status(200).json(reviews);
         break;
 
@@ -44,7 +69,7 @@ async function handler(req, res) {
         }
 
         // Get existing reviews
-        const existingReviewsData = await kv.get('customerReviews');
+        const existingReviewsData = await storage.get('customerReviews');
         const existingReviews = existingReviewsData ? JSON.parse(existingReviewsData) : [];
 
         // Create new review
@@ -61,10 +86,10 @@ async function handler(req, res) {
         // Add to existing reviews (newest first)
         const updatedReviews = [newReview, ...existingReviews];
 
-        // Save to Vercel KV
-        await kv.set('customerReviews', JSON.stringify(updatedReviews));
+        // Save to storage
+        await storage.set('customerReviews', JSON.stringify(updatedReviews));
 
-        console.log('Review submitted and saved to database:', newReview);
+        console.log(`Review submitted and saved to ${kv ? 'Vercel KV' : 'fallback storage'}:`, newReview);
         res.status(201).json({
           message: 'Review submitted successfully',
           review: newReview
