@@ -124,22 +124,41 @@ async function handler(req, res) {
         console.log('Fetching gallery images from Blob storage');
         try {
           // List all blobs in the gallery folder
-          const { blobs } = await list({ prefix: 'gallery/' });
+          const result = await list({ prefix: 'gallery/' });
+          console.log('List result:', JSON.stringify(result, null, 2));
+          
+          const blobs = result.blobs || result || [];
+          console.log('Blobs found:', blobs.length);
           
           if (blobs && blobs.length > 0) {
             // Map blobs to image format
             const images = blobs
-              .filter(blob => blob.contentType && blob.contentType.startsWith('image/'))
-              .map(blob => ({
-                id: blob.url, // Use URL as ID
-                src: blob.url,
-                alt: blob.metadata?.alt || blob.pathname.split('/').pop() || 'Gallery Image',
-                uploadedAt: blob.uploadedAt ? new Date(blob.uploadedAt).toISOString() : new Date().toISOString(),
-                uploadedBy: blob.metadata?.uploadedBy || 'admin'
-              }))
+              .filter(blob => {
+                const contentType = blob.contentType || blob.mimeType || '';
+                const isImage = contentType.startsWith('image/');
+                console.log('Blob:', blob.pathname || blob.url, 'ContentType:', contentType, 'IsImage:', isImage);
+                return isImage;
+              })
+              .map(blob => {
+                const url = blob.url || blob.downloadUrl || '';
+                const pathname = blob.pathname || blob.url?.split('/').pop() || '';
+                const contentType = blob.contentType || blob.mimeType || 'image/jpeg';
+                const metadata = blob.metadata || {};
+                const uploadedAt = blob.uploadedAt || blob.createdAt || new Date();
+                
+                return {
+                  id: url, // Use URL as ID
+                  src: url,
+                  alt: metadata.alt || pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
+                  uploadedAt: new Date(uploadedAt).toISOString(),
+                  uploadedBy: metadata.uploadedBy || 'admin'
+                };
+              })
               .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()); // Sort by newest first
             
-            // Combine with default images
+            console.log('Mapped images:', images.length);
+            
+            // Combine with default images (uploaded images first, then defaults)
             const allImages = [...images, ...defaultGalleryImages];
             console.log('Returning images from Blob storage:', images.length, 'plus', defaultGalleryImages.length, 'defaults');
             return res.status(200).json(allImages);
@@ -150,6 +169,7 @@ async function handler(req, res) {
           }
         } catch (blobError) {
           console.error('Blob storage error, falling back to defaults:', blobError);
+          console.error('Error details:', blobError.message, blobError.stack);
           // Blob error, return defaults instead of error
           console.log('Falling back to default images due to Blob storage error');
           return res.status(200).json(defaultGalleryImages);
