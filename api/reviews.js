@@ -25,18 +25,34 @@ function wrapCors(handler) {
   };
 }
 
+// Fallback storage using file system for local development
+const fs = require('fs');
+const path = require('path');
+
+const reviewsFilePath = path.join(process.cwd(), 'reviews.json');
+
 // Fallback storage functions for local development
 const localStorageFallback = {
   get: async (key) => {
-    // In serverless environment, we can't access localStorage
-    // Return empty array for development
-    console.log('Using localStorage fallback - returning empty reviews');
+    try {
+      if (fs.existsSync(reviewsFilePath)) {
+        const data = fs.readFileSync(reviewsFilePath, 'utf8');
+        console.log('Using file fallback - loaded reviews from file');
+        return data;
+      }
+    } catch (error) {
+      console.error('Error reading reviews file:', error);
+    }
+    console.log('Using file fallback - no reviews file found');
     return null;
   },
   set: async (key, value) => {
-    console.log('Using localStorage fallback - data would be saved locally');
-    // In serverless environment, we can't persist data
-    // Just log for development
+    try {
+      fs.writeFileSync(reviewsFilePath, value, 'utf8');
+      console.log('Using file fallback - saved reviews to file');
+    } catch (error) {
+      console.error('Error writing reviews file:', error);
+    }
   }
 };
 

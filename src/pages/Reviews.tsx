@@ -63,6 +63,8 @@ const Reviews = () => {
         if (response.ok) {
           const reviewsData = await response.json();
           setReviews(reviewsData);
+          // Also save to localStorage as backup
+          localStorage.setItem('customerReviews', JSON.stringify(reviewsData));
         } else {
           console.error('Failed to fetch reviews:', response.status, response.statusText);
           // Fallback to localStorage if API fails

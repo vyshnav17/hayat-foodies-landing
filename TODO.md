@@ -12,6 +12,7 @@
 - [x] Implement star rating component
 - [x] Display submitted reviews publicly
 - [x] Fix reviews visibility issue - migrate to Vercel KV database
+- [x] Add fallback to localStorage when API fails
 - [ ] Test review submission and display
 
 ## Implementation Details
