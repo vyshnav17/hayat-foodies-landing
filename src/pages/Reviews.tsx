@@ -56,37 +56,58 @@ const Reviews = () => {
   });
 
   useEffect(() => {
-    // Load reviews from localStorage
-    const savedReviews = localStorage.getItem('customerReviews');
-    if (savedReviews) {
+    // Load reviews from API
+    const fetchReviews = async () => {
       try {
-        const parsedReviews = JSON.parse(savedReviews);
-        setReviews(parsedReviews);
+        const response = await fetch('/api/reviews');
+        if (response.ok) {
+          const reviewsData = await response.json();
+          setReviews(reviewsData);
+        } else {
+          console.error('Failed to fetch reviews');
+        }
       } catch (error) {
-        console.error('Error parsing saved reviews:', error);
+        console.error('Error fetching reviews:', error);
       }
-    }
+    };
+
+    fetchReviews();
   }, []);
 
   const onSubmit = async (data: ReviewForm) => {
     setIsSubmitting(true);
     try {
+      // Submit to API
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit review');
+      }
+
+      const result = await response.json();
+
+      // Add the new review to the local state
       const newReview: Review = {
-        id: Date.now().toString(),
-        ...data,
-        timestamp: new Date().toISOString(),
-        verified: false, // Can be set to true after admin verification
+        id: result.review.id,
+        name: result.review.name,
+        email: result.review.email,
+        rating: result.review.rating,
+        review: result.review.review,
+        timestamp: result.review.timestamp,
+        verified: result.review.verified,
       };
 
-      const updatedReviews = [newReview, ...reviews];
-      setReviews(updatedReviews);
-
-      // Save to localStorage
-      localStorage.setItem('customerReviews', JSON.stringify(updatedReviews));
+      setReviews(prevReviews => [newReview, ...prevReviews]);
 
       toast({
         title: "Review submitted successfully!",
-        description: "Thank you for your feedback. Your review will be visible after verification.",
+        description: "Thank you for your feedback. Your review is now visible to all visitors.",
       });
 
       form.reset();

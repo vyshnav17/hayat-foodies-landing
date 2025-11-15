@@ -1,4 +1,5 @@
 import cors from 'cors';
+import { kv } from '@vercel/kv';
 
 const corsHandler = cors({
   origin: true,
@@ -22,10 +23,11 @@ async function handler(req, res) {
   try {
     switch (req.method) {
       case 'GET':
-        // Return reviews from localStorage (in production, this would be from a database)
-        // Since this is a serverless function, we'll return empty array
-        // Reviews are stored client-side in localStorage
-        res.status(200).json([]);
+        // Get reviews from Vercel KV
+        const reviewsData = await kv.get('customerReviews');
+        const reviews = reviewsData ? JSON.parse(reviewsData) : [];
+        console.log(`Retrieved ${reviews.length} reviews from database`);
+        res.status(200).json(reviews);
         break;
 
       case 'POST':
@@ -41,8 +43,11 @@ async function handler(req, res) {
           return res.status(400).json({ error: 'Rating must be between 1 and 5' });
         }
 
-        // In a real application, you would save to a database
-        // For now, we'll just return success since reviews are stored client-side
+        // Get existing reviews
+        const existingReviewsData = await kv.get('customerReviews');
+        const existingReviews = existingReviewsData ? JSON.parse(existingReviewsData) : [];
+
+        // Create new review
         const newReview = {
           id: Date.now().toString(),
           name,
@@ -53,7 +58,13 @@ async function handler(req, res) {
           verified: false
         };
 
-        console.log('Review submitted:', newReview);
+        // Add to existing reviews (newest first)
+        const updatedReviews = [newReview, ...existingReviews];
+
+        // Save to Vercel KV
+        await kv.set('customerReviews', JSON.stringify(updatedReviews));
+
+        console.log('Review submitted and saved to database:', newReview);
         res.status(201).json({
           message: 'Review submitted successfully',
           review: newReview
