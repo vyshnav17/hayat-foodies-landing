@@ -125,35 +125,54 @@ async function handler(req, res) {
         try {
           // List all blobs in the gallery folder
           const result = await list({ prefix: 'gallery/' });
-          console.log('List result:', JSON.stringify(result, null, 2));
           
-          const blobs = result.blobs || result || [];
+          // Handle different response formats from Vercel Blob
+          let blobs = [];
+          if (Array.isArray(result)) {
+            blobs = result;
+          } else if (result && Array.isArray(result.blobs)) {
+            blobs = result.blobs;
+          } else if (result && result.blobs) {
+            blobs = [result.blobs];
+          }
+          
           console.log('Blobs found:', blobs.length);
+          console.log('First blob sample:', blobs[0] ? JSON.stringify(blobs[0], null, 2) : 'none');
           
           if (blobs && blobs.length > 0) {
-            // Map blobs to image format
+            // Map blobs to image format - be more flexible with property names
             const images = blobs
-              .filter(blob => {
-                const contentType = blob.contentType || blob.mimeType || '';
-                const isImage = contentType.startsWith('image/');
-                console.log('Blob:', blob.pathname || blob.url, 'ContentType:', contentType, 'IsImage:', isImage);
-                return isImage;
-              })
               .map(blob => {
-                const url = blob.url || blob.downloadUrl || '';
-                const pathname = blob.pathname || blob.url?.split('/').pop() || '';
-                const contentType = blob.contentType || blob.mimeType || 'image/jpeg';
+                // Try multiple possible property names
+                const url = blob.url || blob.downloadUrl || blob.publicUrl || '';
+                const pathname = blob.pathname || blob.key || blob.name || url.split('/').pop() || '';
+                const contentType = blob.contentType || blob.mimeType || blob.type || 'image/jpeg';
                 const metadata = blob.metadata || {};
-                const uploadedAt = blob.uploadedAt || blob.createdAt || new Date();
+                const uploadedAt = blob.uploadedAt || blob.createdAt || blob.uploaded || new Date();
                 
                 return {
-                  id: url, // Use URL as ID
-                  src: url,
-                  alt: metadata.alt || pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
-                  uploadedAt: new Date(uploadedAt).toISOString(),
-                  uploadedBy: metadata.uploadedBy || 'admin'
+                  blob: blob, // Include raw blob for debugging
+                  url,
+                  pathname,
+                  contentType,
+                  metadata,
+                  uploadedAt
                 };
               })
+              .filter(item => {
+                // Filter for images - be lenient if contentType is missing
+                const isImage = item.contentType.startsWith('image/') || 
+                               item.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
+                console.log('Blob item:', item.pathname, 'ContentType:', item.contentType, 'IsImage:', isImage);
+                return isImage;
+              })
+              .map(item => ({
+                id: item.url, // Use URL as ID
+                src: item.url,
+                alt: item.metadata.alt || item.pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
+                uploadedAt: new Date(item.uploadedAt).toISOString(),
+                uploadedBy: item.metadata.uploadedBy || 'admin'
+              }))
               .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()); // Sort by newest first
             
             console.log('Mapped images:', images.length);
@@ -169,7 +188,10 @@ async function handler(req, res) {
           }
         } catch (blobError) {
           console.error('Blob storage error, falling back to defaults:', blobError);
-          console.error('Error details:', blobError.message, blobError.stack);
+          console.error('Error details:', blobError.message);
+          if (blobError.stack) {
+            console.error('Stack:', blobError.stack);
+          }
           // Blob error, return defaults instead of error
           console.log('Falling back to default images due to Blob storage error');
           return res.status(200).json(defaultGalleryImages);
