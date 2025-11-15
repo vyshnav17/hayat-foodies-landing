@@ -1,28 +1,10 @@
 import cors from 'cors';
 import { put, list, del } from '@vercel/blob';
-import multer from 'multer';
+import busboy from 'busboy';
 
 const corsHandler = cors({
   origin: true,
   credentials: true
-});
-
-// Configure multer for memory storage (for Vercel Blob)
-const storage = multer.memoryStorage();
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    // Check if file is an image
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
-    }
-  }
 });
 
 // Default gallery images
@@ -82,16 +64,54 @@ function wrapCors(handler) {
   };
 }
 
-// Middleware to handle file uploads
-function uploadMiddleware(req, res) {
+// Parse FormData using busboy for Vercel serverless functions
+async function parseFormData(req) {
   return new Promise((resolve, reject) => {
-    upload.single('image')(req, res, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
+    const bb = busboy({ headers: req.headers });
+    const fileChunks = [];
+    let file = null;
+    let alt = '';
+    let uploadedBy = 'admin';
+    let filename = '';
+    let mimetype = '';
+
+    bb.on('file', (name, stream, info) => {
+      if (name === 'image') {
+        filename = info.filename;
+        mimetype = info.mimeType;
+        
+        stream.on('data', (chunk) => {
+          fileChunks.push(chunk);
+        });
+
+        stream.on('end', () => {
+          file = {
+            buffer: Buffer.concat(fileChunks),
+            originalname: filename,
+            mimetype: mimetype,
+            size: Buffer.concat(fileChunks).length
+          };
+        });
       }
     });
+
+    bb.on('field', (name, value) => {
+      if (name === 'alt') {
+        alt = value;
+      } else if (name === 'uploadedBy') {
+        uploadedBy = value;
+      }
+    });
+
+    bb.on('finish', () => {
+      resolve({ file, alt, uploadedBy });
+    });
+
+    bb.on('error', (error) => {
+      reject(error);
+    });
+
+    req.pipe(bb);
   });
 }
 
@@ -138,37 +158,57 @@ async function handler(req, res) {
       case 'POST':
         console.log('Processing file upload');
 
-        // Handle file upload
+        // Parse FormData manually
+        let file, altText, uploadedBy;
         try {
-          await uploadMiddleware(req, res);
-          console.log('Upload middleware passed');
-        } catch (uploadError) {
-          console.error('Upload middleware error:', uploadError);
-          return res.status(400).json({ error: uploadError.message || 'File upload failed' });
+          const parsed = await parseFormData(req);
+          file = parsed.file;
+          altText = parsed.alt || "Uploaded Image";
+          uploadedBy = parsed.uploadedBy || "admin";
+          console.log('FormData parsed successfully');
+        } catch (parseError) {
+          console.error('FormData parse error:', parseError);
+          return res.status(400).json({ error: 'Failed to parse form data: ' + parseError.message });
         }
 
         // Check if file was uploaded
-        if (!req.file) {
+        if (!file) {
           console.error('No file provided');
           return res.status(400).json({ error: 'No image file provided' });
         }
 
-        console.log('File received:', req.file.originalname, 'Size:', req.file.size);
+        // Validate file type
+        if (!file.mimetype.startsWith('image/')) {
+          console.error('Invalid file type:', file.mimetype);
+          return res.status(400).json({ error: 'Only image files are allowed' });
+        }
+
+        // Validate file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          console.error('File too large:', file.size);
+          return res.status(400).json({ error: 'File size must be less than 5MB' });
+        }
+
+        console.log('File received:', file.originalname, 'Size:', file.size, 'Type:', file.mimetype);
 
         // Upload to Vercel Blob
         try {
           console.log('Uploading to Vercel Blob...');
-          const altText = req.body.alt || req.file.originalname || "Uploaded Image";
-          const uploadedBy = req.body.uploadedBy || "admin";
+          const alt = altText || file.originalname || "Uploaded Image";
+          const uploadedByUser = uploadedBy || "admin";
           
-          const blob = await put(`gallery/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
+          // Sanitize filename
+          const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+          const blobPath = `gallery/${Date.now()}-${sanitizedFilename}`;
+          
+          const blob = await put(blobPath, file.buffer, {
             access: 'public',
-            contentType: req.file.mimetype,
+            contentType: file.mimetype,
             addRandomSuffix: false,
             // Store metadata in blob
             metadata: {
-              alt: altText,
-              uploadedBy: uploadedBy
+              alt: alt,
+              uploadedBy: uploadedByUser
             }
           });
           
@@ -177,16 +217,20 @@ async function handler(req, res) {
           const newImage = {
             id: blob.url, // Use URL as ID
             src: blob.url,
-            alt: altText,
+            alt: alt,
             uploadedAt: blob.uploadedAt ? new Date(blob.uploadedAt).toISOString() : new Date().toISOString(),
-            uploadedBy: uploadedBy
+            uploadedBy: uploadedByUser
           };
 
           console.log('Image uploaded successfully, returning:', newImage);
           return res.status(201).json({ message: 'Image uploaded and saved successfully', image: newImage });
         } catch (blobError) {
           console.error('Blob upload error:', blobError);
-          return res.status(500).json({ error: 'Failed to upload to storage', details: blobError.message });
+          return res.status(500).json({ 
+            error: 'Failed to upload to storage', 
+            details: blobError.message || 'Unknown error',
+            stack: process.env.NODE_ENV === 'development' ? blobError.stack : undefined
+          });
         }
         break;
 
