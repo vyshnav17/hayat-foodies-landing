@@ -166,13 +166,27 @@ async function handler(req, res) {
                 console.log('Blob item:', item.pathname, 'ContentType:', item.contentType, 'IsImage:', isImage);
                 return isImage;
               })
-              .map(item => ({
-                id: item.url, // Use URL as ID
-                src: item.url,
-                alt: item.metadata.alt || item.pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
-                uploadedAt: new Date(item.uploadedAt).toISOString(),
-                uploadedBy: item.metadata.uploadedBy || 'admin'
-              }))
+              .map(item => {
+                // Extract metadata - handle both object and string formats
+                let metadata = {};
+                if (typeof item.metadata === 'string') {
+                  try {
+                    metadata = JSON.parse(item.metadata);
+                  } catch (e) {
+                    metadata = {};
+                  }
+                } else if (item.metadata && typeof item.metadata === 'object') {
+                  metadata = item.metadata;
+                }
+                
+                return {
+                  id: item.url, // Use URL as ID
+                  src: item.url,
+                  alt: metadata.alt || item.metadata?.alt || item.pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
+                  uploadedAt: new Date(item.uploadedAt).toISOString(),
+                  uploadedBy: metadata.uploadedBy || item.metadata?.uploadedBy || 'admin'
+                };
+              })
               .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()); // Sort by newest first
             
             console.log('Mapped images:', images.length);

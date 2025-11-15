@@ -78,16 +78,15 @@ const Gallery = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {galleryImages.map((image, index) => (
               <div
-                key={index}
+                key={image.id || index}
                 className="group relative overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105 transform"
               >
                 <img
                   src={image.src}
-                  alt={`Hayat Foods ${image.alt}`}
-                  className="w-full h-64 object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
+                  alt={image.alt}
+                  className="w-full aspect-square object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 ease-in-out" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
                   <p className="text-white font-medium text-center">{image.alt}</p>
                 </div>
               </div>
