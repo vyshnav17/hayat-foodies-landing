@@ -182,10 +182,39 @@ async function handler(req, res) {
                 return isImage;
               })
               .map(item => {
+                // Parse alt text from pathname for uploaded images
+                // Format: gallery/timestamp-altSlug-filename
+                let altText = item.metadata?.alt || 'Gallery Image';
+
+                // Try to extract alt text from pathname if metadata is not available
+                if (!item.metadata?.alt) {
+                  const filename = item.pathname.split('/').pop() || '';
+                  // Check if filename follows the new format: timestamp-altSlug-filename
+                  const parts = filename.split('-');
+                  if (parts.length >= 3) {
+                    // Remove timestamp and filename, join remaining parts as alt slug
+                    const timestamp = parts[0];
+                    const filenamePart = parts[parts.length - 1];
+                    const altSlugParts = parts.slice(1, -1); // Everything between timestamp and filename
+
+                    if (altSlugParts.length > 0) {
+                      // Convert slug back to readable text
+                      altText = altSlugParts.join(' ')
+                        .replace(/-/g, ' ') // Replace hyphens with spaces
+                        .replace(/\b\w/g, l => l.toUpperCase()); // Title case
+                    }
+                  }
+
+                  // Fallback to filename without extension if alt text couldn't be parsed
+                  if (altText === 'Gallery Image') {
+                    altText = filename.replace(/\.[^/.]+$/, '').replace(/-/g, ' ');
+                  }
+                }
+
                 return {
                   id: item.url, // Use URL as ID
                   src: item.url,
-                  alt: item.metadata?.alt || item.pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
+                  alt: altText,
                   uploadedAt: new Date(item.uploadedAt).toISOString(),
                   uploadedBy: item.metadata?.uploadedBy || 'admin'
                 };
@@ -255,16 +284,23 @@ async function handler(req, res) {
           console.log('Uploading to Vercel Blob...');
           const alt = altText || file.originalname || "Uploaded Image";
           const uploadedByUser = uploadedBy || "admin";
-          
+
+          // Create alt text slug for filename encoding
+          const altSlug = alt.toLowerCase()
+            .replace(/[^a-zA-Z0-9\s-]/g, '') // Remove special characters except spaces and hyphens
+            .replace(/\s+/g, '-') // Replace spaces with hyphens
+            .replace(/-+/g, '-') // Replace multiple hyphens with single
+            .trim();
+
           // Sanitize filename
           const sanitizedFilename = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-          const blobPath = `gallery/${Date.now()}-${sanitizedFilename}`;
-          
+          const blobPath = `gallery/${Date.now()}-${altSlug}-${sanitizedFilename}`;
+
           const blob = await put(blobPath, file.buffer, {
             access: 'public',
             contentType: file.mimetype,
             addRandomSuffix: false,
-            // Store metadata in blob
+            // Store metadata in blob (for future compatibility)
             metadata: {
               alt: alt,
               uploadedBy: uploadedByUser
