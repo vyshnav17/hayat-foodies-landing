@@ -492,7 +492,9 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
 
   const deleteGalleryImage = async (id: string) => {
     try {
-      const response = await fetch(`/api/gallery?id=${id}`, {
+      // Encode the URL if it's a full URL (for blob storage)
+      const encodedId = id.startsWith('http') ? encodeURIComponent(id) : id;
+      const response = await fetch(`/api/gallery?id=${encodedId}`, {
         method: 'DELETE'
       });
 

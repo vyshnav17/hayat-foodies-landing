@@ -1,7 +1,6 @@
 import cors from 'cors';
-import { put } from '@vercel/blob';
+import { put, list, del } from '@vercel/blob';
 import multer from 'multer';
-import { sql } from '@vercel/postgres';
 
 const corsHandler = cors({
   origin: true,
@@ -102,29 +101,37 @@ async function handler(req, res) {
   try {
     switch (req.method) {
       case 'GET':
-        console.log('Fetching gallery images from database');
+        console.log('Fetching gallery images from Blob storage');
         try {
-          // Try to fetch from database first
-          const result = await sql`SELECT * FROM gallery_images ORDER BY uploaded_at DESC`;
-          if (result.rows && result.rows.length > 0) {
-            const images = result.rows.map(row => ({
-              id: row.id.toString(),
-              src: row.src,
-              alt: row.alt,
-              uploadedAt: row.uploaded_at ? row.uploaded_at.toISOString() : new Date().toISOString(),
-              uploadedBy: row.uploaded_by || 'admin'
-            }));
-            console.log('Returning images from database:', images.length);
-            return res.status(200).json(images);
+          // List all blobs in the gallery folder
+          const { blobs } = await list({ prefix: 'gallery/' });
+          
+          if (blobs && blobs.length > 0) {
+            // Map blobs to image format
+            const images = blobs
+              .filter(blob => blob.contentType && blob.contentType.startsWith('image/'))
+              .map(blob => ({
+                id: blob.url, // Use URL as ID
+                src: blob.url,
+                alt: blob.metadata?.alt || blob.pathname.split('/').pop() || 'Gallery Image',
+                uploadedAt: blob.uploadedAt ? new Date(blob.uploadedAt).toISOString() : new Date().toISOString(),
+                uploadedBy: blob.metadata?.uploadedBy || 'admin'
+              }))
+              .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()); // Sort by newest first
+            
+            // Combine with default images
+            const allImages = [...images, ...defaultGalleryImages];
+            console.log('Returning images from Blob storage:', images.length, 'plus', defaultGalleryImages.length, 'defaults');
+            return res.status(200).json(allImages);
           } else {
-            // No images in database, return defaults
-            console.log('No images in database, returning defaults');
+            // No images in blob storage, return defaults
+            console.log('No images in Blob storage, returning defaults');
             return res.status(200).json(defaultGalleryImages);
           }
-        } catch (dbError) {
-          console.error('Database error, falling back to defaults:', dbError);
-          // Database error, return defaults instead of error
-          console.log('Falling back to default images due to database error');
+        } catch (blobError) {
+          console.error('Blob storage error, falling back to defaults:', blobError);
+          // Blob error, return defaults instead of error
+          console.log('Falling back to default images due to Blob storage error');
           return res.status(200).json(defaultGalleryImages);
         }
 
@@ -151,55 +158,32 @@ async function handler(req, res) {
         // Upload to Vercel Blob
         try {
           console.log('Uploading to Vercel Blob...');
+          const altText = req.body.alt || req.file.originalname || "Uploaded Image";
+          const uploadedBy = req.body.uploadedBy || "admin";
+          
           const blob = await put(`gallery/${Date.now()}-${req.file.originalname}`, req.file.buffer, {
             access: 'public',
             contentType: req.file.mimetype,
+            addRandomSuffix: false,
+            // Store metadata in blob
+            metadata: {
+              alt: altText,
+              uploadedBy: uploadedBy
+            }
           });
+          
           console.log('Blob upload successful:', blob.url);
 
-          // Save to database
-          try {
-            console.log('Saving to database...');
-            const altText = req.body.alt || req.file.originalname || "Uploaded Image";
-            const uploadedBy = req.body.uploadedBy || "admin";
-            
-            const result = await sql`
-              INSERT INTO gallery_images (src, alt, uploaded_by)
-              VALUES (${blob.url}, ${altText}, ${uploadedBy})
-              RETURNING id, src, alt, uploaded_at, uploaded_by
-            `;
+          const newImage = {
+            id: blob.url, // Use URL as ID
+            src: blob.url,
+            alt: altText,
+            uploadedAt: blob.uploadedAt ? new Date(blob.uploadedAt).toISOString() : new Date().toISOString(),
+            uploadedBy: uploadedBy
+          };
 
-            if (result.rows && result.rows.length > 0) {
-              const dbImage = result.rows[0];
-              const newImage = {
-                id: dbImage.id.toString(),
-                src: dbImage.src,
-                alt: dbImage.alt,
-                uploadedAt: dbImage.uploaded_at ? dbImage.uploaded_at.toISOString() : new Date().toISOString(),
-                uploadedBy: dbImage.uploaded_by || 'admin'
-              };
-
-              console.log('Database save successful, returning image:', newImage);
-              return res.status(201).json({ message: 'Image uploaded and saved successfully', image: newImage });
-            } else {
-              throw new Error('No rows returned from insert');
-            }
-          } catch (dbError) {
-            console.error('Database save error:', dbError);
-            // Still return success since file was uploaded to blob, but warn about persistence
-            const newImage = {
-              id: Date.now().toString(),
-              src: blob.url,
-              alt: req.body.alt || req.file.originalname || "Uploaded Image",
-              uploadedAt: new Date().toISOString(),
-              uploadedBy: req.body.uploadedBy || "admin"
-            };
-            return res.status(201).json({
-              message: 'Image uploaded to storage but database save failed. Image won\'t persist across deployments.',
-              image: newImage,
-              warning: 'Database save failed: ' + dbError.message
-            });
-          }
+          console.log('Image uploaded successfully, returning:', newImage);
+          return res.status(201).json({ message: 'Image uploaded and saved successfully', image: newImage });
         } catch (blobError) {
           console.error('Blob upload error:', blobError);
           return res.status(500).json({ error: 'Failed to upload to storage', details: blobError.message });
@@ -209,30 +193,21 @@ async function handler(req, res) {
       case 'DELETE':
         const { id } = req.query;
         if (!id) {
-          return res.status(400).json({ error: 'Image ID is required' });
+          return res.status(400).json({ error: 'Image URL is required' });
         }
 
         try {
-          // First, get the image URL from the database
-          const result = await sql`SELECT src FROM gallery_images WHERE id = ${parseInt(id)}`;
-          if (!result.rows || result.rows.length === 0) {
-            return res.status(404).json({ error: 'Image not found' });
-          }
-          const imageUrl = result.rows[0].src;
-
-          // Delete the image from the database
-          await sql`DELETE FROM gallery_images WHERE id = ${parseInt(id)}`;
-
+          // ID is the blob URL (decode if it was encoded)
+          const blobUrl = decodeURIComponent(id);
+          
           // Delete the image from Vercel Blob storage
-          // Note: Vercel Blob does not have a direct delete function in the SDK yet.
-          // This is a placeholder for when the functionality is available.
-          // For now, we will just delete the record from the database.
-          console.log(`Image with ID ${id} and URL ${imageUrl} deleted from the database.`);
-
+          await del(blobUrl);
+          
+          console.log(`Image with URL ${blobUrl} deleted from Blob storage.`);
           return res.status(200).json({ message: 'Image deleted successfully' });
-        } catch (dbError) {
-          console.error('Database error during deletion:', dbError);
-          return res.status(500).json({ error: 'Failed to delete image from the database.', details: dbError.message });
+        } catch (blobError) {
+          console.error('Blob storage error during deletion:', blobError);
+          return res.status(500).json({ error: 'Failed to delete image from Blob storage.', details: blobError.message });
         }
         break;
 
