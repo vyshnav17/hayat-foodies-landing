@@ -147,7 +147,22 @@ async function handler(req, res) {
                 const url = blob.url || blob.downloadUrl || blob.publicUrl || '';
                 const pathname = blob.pathname || blob.key || blob.name || url.split('/').pop() || '';
                 const contentType = blob.contentType || blob.mimeType || blob.type || 'image/jpeg';
-                const metadata = blob.metadata || {};
+                
+                // Handle metadata - it might be stored as an object or need to be parsed
+                let metadata = {};
+                if (blob.metadata) {
+                  if (typeof blob.metadata === 'string') {
+                    try {
+                      metadata = JSON.parse(blob.metadata);
+                    } catch (e) {
+                      // If parsing fails, try to extract alt from the string
+                      metadata = { alt: blob.metadata };
+                    }
+                  } else if (typeof blob.metadata === 'object') {
+                    metadata = blob.metadata;
+                  }
+                }
+                
                 const uploadedAt = blob.uploadedAt || blob.createdAt || blob.uploaded || new Date();
                 
                 return {
@@ -163,28 +178,16 @@ async function handler(req, res) {
                 // Filter for images - be lenient if contentType is missing
                 const isImage = item.contentType.startsWith('image/') || 
                                item.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
-                console.log('Blob item:', item.pathname, 'ContentType:', item.contentType, 'IsImage:', isImage);
+                console.log('Blob item:', item.pathname, 'ContentType:', item.contentType, 'IsImage:', isImage, 'Metadata:', JSON.stringify(item.metadata));
                 return isImage;
               })
               .map(item => {
-                // Extract metadata - handle both object and string formats
-                let metadata = {};
-                if (typeof item.metadata === 'string') {
-                  try {
-                    metadata = JSON.parse(item.metadata);
-                  } catch (e) {
-                    metadata = {};
-                  }
-                } else if (item.metadata && typeof item.metadata === 'object') {
-                  metadata = item.metadata;
-                }
-                
                 return {
                   id: item.url, // Use URL as ID
                   src: item.url,
-                  alt: metadata.alt || item.metadata?.alt || item.pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
+                  alt: item.metadata?.alt || item.pathname.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Gallery Image',
                   uploadedAt: new Date(item.uploadedAt).toISOString(),
-                  uploadedBy: metadata.uploadedBy || item.metadata?.uploadedBy || 'admin'
+                  uploadedBy: item.metadata?.uploadedBy || 'admin'
                 };
               })
               .sort((a, b) => new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()); // Sort by newest first
