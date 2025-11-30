@@ -5,16 +5,26 @@ import path from 'path';
 // Try to import Vercel KV, fallback to file system if not available
 let kv = null;
 try {
-  // Dynamic import to avoid build errors if package is missing or env vars are missing
+  console.log('Attempting to import @vercel/kv...');
   const kvModule = await import('@vercel/kv');
-  // Check if KV is actually configured by checking for one of the required env vars
+  console.log('@vercel/kv imported successfully.');
+
+  // Log env var presence (masked)
+  console.log('KV_REST_API_URL present:', !!process.env.KV_REST_API_URL);
+  console.log('KV_REST_API_TOKEN present:', !!process.env.KV_REST_API_TOKEN);
+
+  // Check if KV is actually configured
   if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
     kv = kvModule.kv;
+    console.log('Vercel KV configured and ready.');
   } else {
-    console.log('Vercel KV environment variables missing, using file system fallback');
+    console.log('Vercel KV environment variables missing, using file system fallback.');
   }
 } catch (error) {
-  console.log('Vercel KV package not available or error importing, using file system fallback');
+  console.error('Error initializing Vercel KV:', error);
+  if (error.code === 'MODULE_NOT_FOUND') {
+    console.log('Module @vercel/kv not found. Ensure it is in dependencies.');
+  }
 }
 
 const corsHandler = cors({
@@ -66,8 +76,9 @@ function wrapCors(handler) {
 
 async function handler(req, res) {
   // Add debug header to indicate storage type
-  res.setHeader('X-Storage-Type', kv ? 'Vercel-KV' : 'File-System-Fallback');
-  console.log('Reviews API called with method:', req.method);
+  const storageType = kv ? 'Vercel-KV' : 'File-System-Fallback';
+  res.setHeader('X-Storage-Type', storageType);
+  console.log(`Reviews API called: ${req.method} | Storage: ${storageType}`);
 
   try {
     switch (req.method) {
@@ -90,7 +101,7 @@ async function handler(req, res) {
             }
           }
 
-          console.log(`Retrieved ${reviews.length} reviews from ${kv ? 'Vercel KV' : 'fallback storage'}`);
+          console.log(`Retrieved ${reviews.length} reviews`);
           res.status(200).json(reviews);
         } catch (error) {
           console.error('Error fetching reviews:', error);
@@ -145,11 +156,11 @@ async function handler(req, res) {
           // Save to storage
           await storage.set('customerReviews', JSON.stringify(updatedReviews));
 
-          console.log(`Review submitted and saved to ${kv ? 'Vercel KV' : 'fallback storage'}:`, newReview);
+          console.log(`Review submitted and saved. New count: ${updatedReviews.length}`);
           res.status(201).json({
             message: 'Review submitted successfully',
             review: newReview,
-            debug: { storageType: kv ? 'KV' : 'File' }
+            debug: { storageType }
           });
         } catch (error) {
           console.error('Error submitting review:', error);
