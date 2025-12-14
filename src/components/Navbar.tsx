@@ -19,6 +19,7 @@ import {
 import logo from "@/assets/logo.png";
 import whatsappIcon from "@/assets/icons8-whatsapp-24.png";
 import { useIsMobile } from "@/hooks/use-mobile";
+import UserLogin from "./UserLogin";
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -54,11 +55,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${
-      isScrolled
-        ? 'bg-white/95 backdrop-blur-md shadow-xl border-b border-cream/20'
-        : 'bg-white shadow-lg'
-    }`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out ${isScrolled
+      ? 'bg-white/95 backdrop-blur-md shadow-xl border-b border-cream/20'
+      : 'bg-white shadow-lg'
+      }`}>
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
@@ -67,9 +67,8 @@ const Navbar = () => {
               <img
                 src={logo}
                 alt="Hayat Foods - Premium Bakery Products Logo"
-                className={`w-auto transition-all duration-500 ease-in-out ${
-                  isScrolled ? 'h-16 md:h-20' : 'h-20 md:h-24'
-                } hover:scale-105 transform`}
+                className={`w-auto transition-all duration-500 ease-in-out ${isScrolled ? 'h-16 md:h-20' : 'h-20 md:h-24'
+                  } hover:scale-105 transform`}
               />
             </Link>
           </div>
@@ -165,6 +164,8 @@ const Navbar = () => {
             >
               <Facebook className="h-5 w-5 transition-transform duration-300 ease-in-out" />
             </Button>
+
+            <UserLogin />
           </div>
 
           {/* Mobile Menu Button */}

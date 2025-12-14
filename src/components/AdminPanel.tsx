@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Trash2, Eye, Download, LogOut, CheckCircle, Plus, Edit, Save, Upload, Image as ImageIcon } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MapPin } from "lucide-react";
 import chapatiImg from "@/assets/chapati.jpg";
 import creamBunImg from "@/assets/cream-bun.jpg";
 import chocolateBunImg from "@/assets/chocolate-bun.jpg";
@@ -147,6 +149,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
 
   const [analyticsData, setAnalyticsData] = useState<{ pageViews: any[], events: any[] }>({ pageViews: [], events: [] });
 
+  const [users, setUsers] = useState<any[]>([]);
+
   useEffect(() => {
     // Load submissions from API
     fetchContactSubmissions();
@@ -159,7 +163,22 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
 
     // Load analytics
     fetchAnalytics();
+
+    // Load users
+    fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -619,11 +638,12 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         </div>
 
         <Tabs defaultValue="contact" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-5 h-auto p-1">
             <TabsTrigger value="contact" className="text-xs sm:text-sm py-2">Contact Submissions</TabsTrigger>
             <TabsTrigger value="products" className="text-xs sm:text-sm py-2">Product Management ({products.length})</TabsTrigger>
             <TabsTrigger value="gallery" className="text-xs sm:text-sm py-2">Gallery Management</TabsTrigger>
             <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2">Analytics</TabsTrigger>
+            <TabsTrigger value="users" className="text-xs sm:text-sm py-2">Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="contact" className="space-y-4">
@@ -1324,6 +1344,56 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-4">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Registered Users</h2>
+              <Button onClick={fetchUsers} variant="outline" size="sm">
+                Refresh Data
+              </Button>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>User List ({users.length})</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {users.length === 0 ? (
+                    <p className="text-muted-foreground text-center py-8">
+                      No users registered yet
+                    </p>
+                  ) : (
+                    users.map((user, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg gap-4">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={user.picture} alt={user.name} />
+                            <AvatarFallback>{user.name?.charAt(0)}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{user.name}</p>
+                            <p className="text-sm text-muted-foreground">{user.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:items-end gap-1">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <MapPin className="w-4 h-4" />
+                            <span>
+                              {user.location?.city || 'Unknown'}, {user.location?.country || 'Unknown'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Last login: {new Date(user.lastLogin).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
         </Tabs>
