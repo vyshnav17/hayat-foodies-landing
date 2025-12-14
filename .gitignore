@@ -33,3 +33,5 @@ dist-ssr
 .env*.local
 analytics.json
 users.json
+products.json
+reviews.json
