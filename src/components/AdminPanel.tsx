@@ -145,6 +145,8 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
     },
   ];
 
+  const [analyticsData, setAnalyticsData] = useState<{ pageViews: any[], events: any[] }>({ pageViews: [], events: [] });
+
   useEffect(() => {
     // Load submissions from API
     fetchContactSubmissions();
@@ -154,7 +156,39 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
 
     // Load gallery images from API
     fetchGalleryImages();
+
+    // Load analytics
+    fetchAnalytics();
   }, []);
+
+  const fetchAnalytics = async () => {
+    try {
+      const response = await fetch('/api/analytics');
+      if (response.ok) {
+        const data = await response.json();
+        setAnalyticsData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+    }
+  };
+
+  // Process analytics data for charts
+  const getPageViewsByPath = () => {
+    const counts: Record<string, number> = {};
+    analyticsData.pageViews.forEach(view => {
+      const path = view.path || '/';
+      counts[path] = (counts[path] || 0) + 1;
+    });
+    return Object.entries(counts)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10);
+  };
+
+  const getRecentEvents = () => {
+    return analyticsData.events.slice(0, 20);
+  };
 
   const fetchContactSubmissions = async () => {
     try {
@@ -585,10 +619,11 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
         </div>
 
         <Tabs defaultValue="contact" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 h-auto p-1">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 h-auto p-1">
             <TabsTrigger value="contact" className="text-xs sm:text-sm py-2">Contact Submissions</TabsTrigger>
             <TabsTrigger value="products" className="text-xs sm:text-sm py-2">Product Management ({products.length})</TabsTrigger>
             <TabsTrigger value="gallery" className="text-xs sm:text-sm py-2">Gallery Management</TabsTrigger>
+            <TabsTrigger value="analytics" className="text-xs sm:text-sm py-2">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="contact" className="space-y-4">
@@ -1188,6 +1223,106 @@ const AdminPanel = ({ onLogout }: AdminPanelProps) => {
                   </Card>
                 )}
               </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-4">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
+              <Button onClick={fetchAnalytics} variant="outline" size="sm">
+                Refresh Data
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Total Page Views</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analyticsData.pageViews.length}</div>
+                  <p className="text-xs text-muted-foreground">All time</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Total Events</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{analyticsData.events.length}</div>
+                  <p className="text-xs text-muted-foreground">Interactions tracked</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium">Most Visited Page</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold truncate">
+                    {getPageViewsByPath()[0]?.name || 'N/A'}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {getPageViewsByPath()[0]?.value || 0} views
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Top Pages</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {getPageViewsByPath().map((page, index) => (
+                      <div key={index} className="flex items-center">
+                        <div className="w-full">
+                          <div className="flex justify-between mb-1">
+                            <span className="text-sm font-medium">{page.name}</span>
+                            <span className="text-sm text-muted-foreground">{page.value} views</span>
+                          </div>
+                          <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-primary"
+                              style={{ width: `${(page.value / (getPageViewsByPath()[0]?.value || 1)) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {getPageViewsByPath().length === 0 && (
+                      <p className="text-center text-muted-foreground py-4">No page views recorded yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Recent Events</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {getRecentEvents().map((event, index) => (
+                      <div key={index} className="flex justify-between items-start border-b pb-2 last:border-0">
+                        <div>
+                          <p className="font-medium text-sm">{event.eventName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(event.timestamp).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <Badge variant="outline">{event.path}</Badge>
+                        </div>
+                      </div>
+                    ))}
+                    {getRecentEvents().length === 0 && (
+                      <p className="text-center text-muted-foreground py-4">No events recorded yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
 

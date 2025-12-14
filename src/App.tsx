@@ -15,8 +15,14 @@ import Reviews from "./pages/Reviews";
 import AdminPanel from "./components/AdminPanel";
 import Login from "./components/Login";
 import NotFound from "./pages/NotFound";
+import { useAnalytics } from "./hooks/useAnalytics";
 
 const queryClient = new QueryClient();
+
+const AnalyticsTracker = () => {
+  useAnalytics();
+  return null;
+};
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -47,6 +53,7 @@ const App = () => {
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <AnalyticsTracker />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/gallery" element={<Gallery />} />
