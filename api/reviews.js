@@ -20,7 +20,7 @@ function wrapCors(handler) {
 }
 
 async function handler(req, res) {
-  res.setHeader('X-Storage-Type', 'Prisma-SQLite');
+  res.setHeader('X-Storage-Type', process.env.VERCEL ? 'Prisma-Postgres' : 'Prisma-SQLite');
 
   try {
     switch (req.method) {
@@ -70,7 +70,11 @@ async function handler(req, res) {
           });
         } catch (error) {
           console.error('Error submitting review:', error);
-          res.status(500).json({ error: 'Failed to submit review' });
+          res.status(500).json({
+            error: 'Failed to submit review',
+            details: error.message,
+            code: error.code
+          });
         }
         break;
 

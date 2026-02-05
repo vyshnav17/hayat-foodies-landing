@@ -78,7 +78,11 @@ async function handler(req, res) {
                     res.status(201).json({ success: true });
                 } catch (error) {
                     console.error('Error tracking analytics:', error);
-                    res.status(500).json({ error: 'Failed to track analytics' });
+                    res.status(500).json({
+                        error: 'Failed to track analytics',
+                        details: error.message,
+                        code: error.code
+                    });
                 }
                 break;
 
