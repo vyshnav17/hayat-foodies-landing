@@ -6,34 +6,36 @@ let schema = fs.readFileSync(schemaPath, 'utf8');
 
 if (process.env.VERCEL) {
     console.log('Detected Vercel environment. Switching Prisma provider to postgresql...');
-    // Replace provider with optional space support
     schema = schema.replace(/provider\s*=\s*"sqlite"/, 'provider = "postgresql"');
 
-    // Debug: List all available hayat_ or POSTGRES vars
-    console.log('Searching for database environment variables...');
-    Object.keys(process.env).forEach(key => {
-        if (key.includes('hayat_') || key.includes('POSTGRES_')) {
-            console.log(`Found candidate: ${key} (length: ${process.env[key].length})`);
-        }
-    });
-
-    // Dynamically detect which database variable is set in this project
     const possibleVars = [
         'hayat_POSTGRES_PRISMA_URL',
         'hayat_DATABASE_URL',
         'POSTGRES_PRISMA_URL',
         'POSTGRES_URL',
-        'DATABASE_URL'
+        'DATABASE_URL',
+        'POSTGRES_URL_NON_POOLING'
     ];
-    const dbVar = possibleVars.find(v => process.env[v]);
+
+    // Find a variable that specifically starts with a postgres protocol
+    const dbVar = possibleVars.find(v => {
+        const val = process.env[v];
+        if (!val) return false;
+        const isPostgres = val.startsWith('postgres://') || val.startsWith('postgresql://');
+        if (isPostgres) console.log(`Candidate found: ${v} (Valid Postgres URL)`);
+        else if (v.includes('DATABASE')) console.log(`Candidate ignored: ${v} (Not a Postgres URL: ${val.substring(0, 10)}...)`);
+        return isPostgres;
+    });
 
     if (dbVar) {
-        console.log(`Found database variable: ${dbVar}`);
-        // Replace whatever is inside env() with the detected variable
         schema = schema.replace(/env\s*\(\s*".*"\s*\)/, `env("${dbVar}")`);
         console.log(`Production settings applied (PostgreSQL + ${dbVar})`);
     } else {
-        console.warn('WARNING: No database environment variables detected! Falling back to "DATABASE_URL"');
+        console.error('CRITICAL ERROR: No PostgreSQL environment variables detected!');
+        console.log('Available keys matching hayat/POSTGRES:');
+        Object.keys(process.env).forEach(k => {
+            if (k.includes('hayat') || k.includes('POSTGRES')) console.log(`- ${k}`);
+        });
     }
 } else {
     console.log('Detected local environment. Ensuring Prisma provider is sqlite...');

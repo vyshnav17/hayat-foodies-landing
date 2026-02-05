@@ -70,10 +70,13 @@ async function handler(req, res) {
           });
         } catch (error) {
           console.error('Error submitting review:', error);
+          // Get safe list of env var keys to debug production
+          const envKeys = Object.keys(process.env).filter(k => k.includes('hayat') || k.includes('POSTGRES') || k === 'DATABASE_URL');
           res.status(500).json({
             error: 'Failed to submit review',
             details: error.message,
-            code: error.code
+            code: error.code,
+            envVarsAvailable: envKeys
           });
         }
         break;
