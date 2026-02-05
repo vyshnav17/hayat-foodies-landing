@@ -35,3 +35,5 @@ analytics.json
 users.json
 products.json
 reviews.json
+
+/generated/prisma

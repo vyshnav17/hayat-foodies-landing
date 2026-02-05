@@ -1,31 +1,5 @@
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-
-// Try to import Vercel KV, fallback to file system if not available
-let kv = null;
-try {
-  console.log('Attempting to import @vercel/kv...');
-  const kvModule = await import('@vercel/kv');
-  console.log('@vercel/kv imported successfully.');
-
-  // Log env var presence (masked)
-  console.log('KV_REST_API_URL present:', !!process.env.KV_REST_API_URL);
-  console.log('KV_REST_API_TOKEN present:', !!process.env.KV_REST_API_TOKEN);
-
-  // Check if KV is actually configured
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    kv = kvModule.kv;
-    console.log('Vercel KV configured and ready.');
-  } else {
-    console.log('Vercel KV environment variables missing, using file system fallback.');
-  }
-} catch (error) {
-  console.error('Error initializing Vercel KV:', error);
-  if (error.code === 'MODULE_NOT_FOUND') {
-    console.log('Module @vercel/kv not found. Ensure it is in dependencies.');
-  }
-}
+import prisma from '../src/lib/prisma.js';
 
 const corsHandler = cors({
   origin: true,
@@ -33,35 +7,6 @@ const corsHandler = cors({
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 });
-
-// Fallback storage using file system for local development
-const reviewsFilePath = path.join(process.cwd(), 'reviews.json');
-
-const localStorageFallback = {
-  get: async (key) => {
-    try {
-      if (fs.existsSync(reviewsFilePath)) {
-        const data = fs.readFileSync(reviewsFilePath, 'utf8');
-        console.log('Using file fallback - loaded reviews from file');
-        return JSON.parse(data);
-      }
-    } catch (error) {
-      console.error('Error reading reviews file:', error);
-    }
-    console.log('Using file fallback - no reviews file found');
-    return null;
-  },
-  set: async (key, value) => {
-    try {
-      fs.writeFileSync(reviewsFilePath, value, 'utf8');
-      console.log('Using file fallback - saved reviews to file');
-    } catch (error) {
-      console.error('Error writing reviews file:', error);
-    }
-  }
-};
-
-const storage = kv || localStorageFallback;
 
 function wrapCors(handler) {
   return (req, res) => {
@@ -75,31 +20,15 @@ function wrapCors(handler) {
 }
 
 async function handler(req, res) {
-  // Add debug header to indicate storage type
-  const storageType = kv ? 'Vercel-KV' : 'File-System-Fallback';
-  res.setHeader('X-Storage-Type', storageType);
-  console.log(`Reviews API called: ${req.method} | Storage: ${storageType}`);
+  res.setHeader('X-Storage-Type', 'Prisma-SQLite');
 
   try {
     switch (req.method) {
       case 'GET':
         try {
-          // Get reviews from storage (KV or fallback)
-          const reviewsData = await storage.get('customerReviews');
-          let reviews = [];
-
-          if (reviewsData) {
-            if (typeof reviewsData === 'string') {
-              try {
-                reviews = JSON.parse(reviewsData);
-              } catch (error) {
-                console.error('Error parsing reviews data:', error);
-                reviews = [];
-              }
-            } else {
-              reviews = reviewsData;
-            }
-          }
+          const reviews = await prisma.review.findMany({
+            orderBy: { createdAt: 'desc' }
+          });
 
           console.log(`Retrieved ${reviews.length} reviews`);
           res.status(200).json(reviews);
@@ -123,44 +52,21 @@ async function handler(req, res) {
             return res.status(400).json({ error: 'Rating must be between 1 and 5' });
           }
 
-          // Get existing reviews
-          const existingReviewsData = await storage.get('customerReviews');
-          let existingReviews = [];
-          if (existingReviewsData) {
-            if (typeof existingReviewsData === 'string') {
-              try {
-                existingReviews = JSON.parse(existingReviewsData);
-              } catch (error) {
-                console.error('Error parsing existing reviews data:', error);
-                existingReviews = [];
-              }
-            } else {
-              existingReviews = existingReviewsData;
-            }
-          }
-
           // Create new review
-          const newReview = {
-            id: Date.now().toString(),
-            name,
-            email,
-            rating: parseInt(rating),
-            review,
-            timestamp: new Date().toISOString(),
-            verified: false
-          };
+          const newReview = await prisma.review.create({
+            data: {
+              name,
+              email,
+              rating: parseInt(rating),
+              review,
+              verified: false
+            }
+          });
 
-          // Add to existing reviews (newest first)
-          const updatedReviews = [newReview, ...existingReviews];
-
-          // Save to storage
-          await storage.set('customerReviews', JSON.stringify(updatedReviews));
-
-          console.log(`Review submitted and saved. New count: ${updatedReviews.length}`);
+          console.log(`Review submitted and saved.`);
           res.status(201).json({
             message: 'Review submitted successfully',
-            review: newReview,
-            debug: { storageType }
+            review: newReview
           });
         } catch (error) {
           console.error('Error submitting review:', error);

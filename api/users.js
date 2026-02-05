@@ -1,19 +1,5 @@
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-
-// Try to import Vercel KV, fallback to file system if not available
-let kv = null;
-try {
-    const kvModule = await import('@vercel/kv');
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-        kv = kvModule.kv;
-    } else {
-        console.log('Vercel KV environment variables missing, using file system fallback');
-    }
-} catch (error) {
-    console.log('Vercel KV package not available or error importing, using file system fallback');
-}
+import prisma from '../src/lib/prisma.js';
 
 const corsHandler = cors({
     origin: true,
@@ -21,43 +7,6 @@ const corsHandler = cors({
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 });
-
-// Fallback storage using file system for local development
-const usersFilePath = path.join(process.cwd(), 'users.json');
-
-const localStorageFallback = {
-    get: async (key) => {
-        try {
-            if (fs.existsSync(usersFilePath)) {
-                const data = fs.readFileSync(usersFilePath, 'utf8');
-                const json = JSON.parse(data);
-                return json[key] || [];
-            }
-        } catch (error) {
-            console.error('Error reading users file:', error);
-        }
-        return [];
-    },
-    set: async (key, value) => {
-        try {
-            let allData = {};
-            if (fs.existsSync(usersFilePath)) {
-                try {
-                    allData = JSON.parse(fs.readFileSync(usersFilePath, 'utf8'));
-                } catch (e) {
-                    allData = {};
-                }
-            }
-
-            allData[key] = typeof value === 'string' ? JSON.parse(value) : value;
-            fs.writeFileSync(usersFilePath, JSON.stringify(allData, null, 2), 'utf8');
-        } catch (error) {
-            console.error('Error writing users file:', error);
-        }
-    }
-};
-
-const storage = kv || localStorageFallback;
 
 function wrapCors(handler) {
     return (req, res) => {
@@ -95,20 +44,27 @@ async function getLocationFromIP(ip) {
 }
 
 async function handler(req, res) {
-    res.setHeader('X-Storage-Type', kv ? 'Vercel-KV' : 'File-System-Fallback');
+    res.setHeader('X-Storage-Type', 'Prisma-SQLite');
 
     try {
         switch (req.method) {
             case 'GET':
                 try {
-                    let users = [];
-                    if (kv) {
-                        const usersData = await kv.get('users');
-                        users = usersData || [];
-                    } else {
-                        users = await localStorageFallback.get('users');
-                    }
-                    res.status(200).json(users);
+                    const users = await prisma.user.findMany();
+                    // Parse data field back to object if needed, or return as is?
+                    // The client expects an array of user objects.
+                    // Our schema stores dynamic data in 'data' string, but also has 'email', 'lastLogin'.
+                    // We should merge them.
+                    const mappedUsers = users.map(u => {
+                        let parsedData = {};
+                        try { parsedData = JSON.parse(u.data); } catch (e) { }
+                        return {
+                            ...parsedData,
+                            ...u,
+                            data: undefined // remove raw data field from response
+                        };
+                    });
+                    res.status(200).json(mappedUsers);
                 } catch (error) {
                     console.error('Error fetching users:', error);
                     res.status(500).json({ error: 'Failed to fetch users' });
@@ -135,30 +91,36 @@ async function handler(req, res) {
                         ip
                     };
 
-                    // Fetch existing users
-                    let users = [];
-                    if (kv) {
-                        const usersData = await kv.get('users');
-                        users = usersData || [];
-                    } else {
-                        users = await localStorageFallback.get('users');
-                    }
-
                     // Check if user exists
-                    const existingIndex = users.findIndex(u => u.email === user.email);
-                    if (existingIndex !== -1) {
-                        // Update existing user
-                        users[existingIndex] = { ...users[existingIndex], ...userData };
-                    } else {
-                        // Add new user
-                        users.push({ ...userData, firstLogin: new Date().toISOString() });
-                    }
+                    const existingUser = await prisma.user.findUnique({
+                        where: { email: user.email }
+                    });
 
-                    // Save back
-                    if (kv) {
-                        await kv.set('users', users);
+                    let savedUser;
+                    if (existingUser) {
+                        // Update
+                        let currentData = {};
+                        try { currentData = JSON.parse(existingUser.data); } catch (e) { }
+
+                        const newData = { ...currentData, ...userData };
+
+                        savedUser = await prisma.user.update({
+                            where: { email: user.email },
+                            data: {
+                                lastLogin: new Date(),
+                                data: JSON.stringify(newData)
+                            }
+                        });
                     } else {
-                        await localStorageFallback.set('users', users);
+                        // Create
+                        const newData = { ...userData, firstLogin: new Date().toISOString() };
+                        savedUser = await prisma.user.create({
+                            data: {
+                                email: user.email,
+                                lastLogin: new Date(),
+                                data: JSON.stringify(newData)
+                            }
+                        });
                     }
 
                     res.status(200).json({ success: true, user: userData });

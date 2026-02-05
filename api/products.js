@@ -1,21 +1,5 @@
 import cors from 'cors';
-import fs from 'fs';
-import path from 'path';
-
-// Try to import Vercel KV, fallback to file system if not available
-let kv = null;
-try {
-  // Dynamic import to avoid build errors if package is missing or env vars are missing
-  const kvModule = await import('@vercel/kv');
-  // Check if KV is actually configured by checking for one of the required env vars
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-    kv = kvModule.kv;
-  } else {
-    console.log('Vercel KV environment variables missing, using file system fallback');
-  }
-} catch (error) {
-  console.log('Vercel KV package not available or error importing, using file system fallback');
-}
+import prisma from '../src/lib/prisma.js';
 
 const corsHandler = cors({
   origin: true,
@@ -24,7 +8,6 @@ const corsHandler = cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 });
 
-// Default products data to seed if DB is empty
 const defaultProducts = [
   {
     id: "1",
@@ -88,38 +71,6 @@ const defaultProducts = [
   },
 ];
 
-// Fallback storage using file system for local development
-// Note: In Vercel serverless functions, the filesystem is read-only except for /tmp
-// But for local dev, we can write to a file.
-const productsFilePath = path.join(process.cwd(), 'products.json');
-
-const localStorageFallback = {
-  get: async (key) => {
-    try {
-      if (fs.existsSync(productsFilePath)) {
-        const data = fs.readFileSync(productsFilePath, 'utf8');
-        console.log('Using file fallback - loaded products from file');
-        return JSON.parse(data);
-      }
-    } catch (error) {
-      console.error('Error reading products file:', error);
-    }
-    console.log('Using file fallback - no products file found');
-    return null;
-  },
-  set: async (key, value) => {
-    try {
-      // value is already a string (JSON.stringify called by caller)
-      fs.writeFileSync(productsFilePath, value, 'utf8');
-      console.log('Using file fallback - saved products to file');
-    } catch (error) {
-      console.error('Error writing products file:', error);
-    }
-  }
-};
-
-const storage = kv || localStorageFallback;
-
 function wrapCors(handler) {
   return (req, res) => {
     return new Promise((resolve, reject) => {
@@ -132,40 +83,42 @@ function wrapCors(handler) {
 }
 
 async function handler(req, res) {
-  // Add debug header to indicate storage type
-  res.setHeader('X-Storage-Type', kv ? 'Vercel-KV' : 'File-System-Fallback');
+  res.setHeader('X-Storage-Type', 'Prisma-SQLite');
 
   try {
     switch (req.method) {
       case 'GET':
         try {
-          let productsData = await storage.get('products');
-          let products = [];
+          let products = await prisma.product.findMany();
 
-          if (productsData) {
-            if (typeof productsData === 'string') {
-              try {
-                products = JSON.parse(productsData);
-              } catch (e) {
-                console.error('Error parsing products JSON:', e);
-                products = [];
-              }
-            } else {
-              products = productsData;
-            }
+          if (products.length === 0) {
+            // Seed defaults
+            const seedOperations = defaultProducts.map(p =>
+              prisma.product.create({
+                data: {
+                  ...p,
+                  images: JSON.stringify(p.images),
+                  ingredients: JSON.stringify(p.ingredients),
+                  quantity: p.quantity || null,
+                  weight: p.weight || null
+                }
+              })
+            );
+            await prisma.$transaction(seedOperations);
+            products = await prisma.product.findMany();
           }
 
-          if (!products || products.length === 0) {
-            // Seed with default products if empty
-            products = defaultProducts;
-            await storage.set('products', JSON.stringify(products));
-          }
+          // Parse JSON fields
+          const parsedProducts = products.map(p => ({
+            ...p,
+            images: JSON.parse(p.images),
+            ingredients: JSON.parse(p.ingredients)
+          }));
 
-          res.status(200).json(products);
+          res.status(200).json(parsedProducts);
         } catch (error) {
           console.error('Error fetching products:', error);
-          // Fallback to default products on error
-          res.status(200).json(defaultProducts);
+          res.status(500).json({ error: 'Failed to fetch products' });
         }
         break;
 
@@ -176,30 +129,23 @@ async function handler(req, res) {
             return res.status(400).json({ error: 'Name and price are required' });
           }
 
-          // Generate ID if not present
-          if (!newProduct.id) {
-            newProduct.id = Date.now().toString();
-          }
-
-          let productsData = await storage.get('products');
-          let products = [];
-          if (productsData) {
-            if (typeof productsData === 'string') {
-              try { products = JSON.parse(productsData); } catch (e) { products = []; }
-            } else {
-              products = productsData;
+          const product = await prisma.product.create({
+            data: {
+              ...newProduct,
+              images: JSON.stringify(newProduct.images || []),
+              ingredients: JSON.stringify(newProduct.ingredients || []),
+              quantity: newProduct.quantity ? parseInt(newProduct.quantity) : null,
+              weight: newProduct.weight ? parseFloat(newProduct.weight) : null,
+              price: parseFloat(newProduct.price),
+              gst: newProduct.gst ? parseFloat(newProduct.gst) : null
             }
-          }
+          });
 
-          // If no products found, start with defaults
-          if (products.length === 0) {
-            products = [...defaultProducts];
-          }
-
-          products.push(newProduct);
-          await storage.set('products', JSON.stringify(products));
-
-          res.status(201).json(newProduct);
+          res.status(201).json({
+            ...product,
+            images: JSON.parse(product.images),
+            ingredients: JSON.parse(product.ingredients)
+          });
         } catch (error) {
           console.error('Error adding product:', error);
           res.status(500).json({ error: 'Failed to add product' });
@@ -213,30 +159,27 @@ async function handler(req, res) {
             return res.status(400).json({ error: 'Product ID is required' });
           }
 
-          let productsData = await storage.get('products');
-          let products = [];
-          if (productsData) {
-            if (typeof productsData === 'string') {
-              try { products = JSON.parse(productsData); } catch (e) { products = []; }
-            } else {
-              products = productsData;
-            }
-          }
+          const { id, ...data } = updatedProduct;
 
-          // If no products found, start with defaults
-          if (products.length === 0) {
-            products = [...defaultProducts];
-          }
+          // Handle special fields
+          const updateData = { ...data };
+          if (data.images) updateData.images = JSON.stringify(data.images);
+          if (data.ingredients) updateData.ingredients = JSON.stringify(data.ingredients);
+          if (data.quantity) updateData.quantity = parseInt(data.quantity);
+          if (data.weight) updateData.weight = parseFloat(data.weight);
+          if (data.price) updateData.price = parseFloat(data.price);
+          if (data.gst) updateData.gst = parseFloat(data.gst);
 
-          const index = products.findIndex(p => p.id === updatedProduct.id);
+          const product = await prisma.product.update({
+            where: { id: id },
+            data: updateData
+          });
 
-          if (index !== -1) {
-            products[index] = { ...products[index], ...updatedProduct };
-            await storage.set('products', JSON.stringify(products));
-            res.status(200).json(products[index]);
-          } else {
-            res.status(404).json({ error: 'Product not found' });
-          }
+          res.status(200).json({
+            ...product,
+            images: JSON.parse(product.images),
+            ingredients: JSON.parse(product.ingredients)
+          });
         } catch (error) {
           console.error('Error updating product:', error);
           res.status(500).json({ error: 'Failed to update product' });
@@ -250,45 +193,14 @@ async function handler(req, res) {
             return res.status(400).json({ error: 'Product ID is required' });
           }
 
-          let productsData = await storage.get('products');
-          let products = [];
-          if (productsData) {
-            if (typeof productsData === 'string') {
-              try { products = JSON.parse(productsData); } catch (e) { products = []; }
-            } else {
-              products = productsData;
-            }
-          }
-
-          // CRITICAL FIX: If products is empty (e.g. first run or read error), use defaultProducts as base
-          if (products.length === 0) {
-            console.log('DELETE: Products list empty, seeding with defaults before delete');
-            products = [...defaultProducts];
-          }
-
-          const initialLength = products.length;
-          const filteredProducts = products.filter(p => p.id !== id);
-
-          if (filteredProducts.length === initialLength) {
-            console.log(`DELETE: Product with ID ${id} not found in list of ${initialLength} products`);
-          } else {
-            console.log(`DELETE: Removed product ${id}. Count: ${initialLength} -> ${filteredProducts.length}`);
-          }
-
-          await storage.set('products', JSON.stringify(filteredProducts));
-
-          res.status(200).json({
-            message: 'Product deleted successfully',
-            debug: {
-              deletedId: id,
-              previousCount: initialLength,
-              newCount: filteredProducts.length,
-              storageType: kv ? 'KV' : 'File'
-            }
+          await prisma.product.delete({
+            where: { id: id }
           });
+
+          res.status(200).json({ message: 'Product deleted successfully' });
         } catch (error) {
           console.error('Error deleting product:', error);
-          res.status(500).json({ error: 'Failed to delete product', details: error.message });
+          res.status(500).json({ error: 'Failed to delete product' });
         }
         break;
 
