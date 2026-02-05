@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node scripts/prep-db.js && npx prisma generate && npx prisma db push --accept-data-loss && vite build",
+  "buildCommand": "node scripts/prep-db.js && npx prisma generate && (npx prisma db push --accept-data-loss || echo 'DB push failed, continuing...') && vite build",
   "installCommand": "npm install",
   "framework": "vite",
   "outputDirectory": "dist",
@@ -7,6 +7,9 @@
     {
       "source": "/api/:path*",
       "destination": "/api/:path*"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "source": "/(.*)",
