@@ -9,6 +9,14 @@ if (process.env.VERCEL) {
     // Replace provider with optional space support
     schema = schema.replace(/provider\s*=\s*"sqlite"/, 'provider = "postgresql"');
 
+    // Debug: List all available hayat_ or POSTGRES vars
+    console.log('Searching for database environment variables...');
+    Object.keys(process.env).forEach(key => {
+        if (key.includes('hayat_') || key.includes('POSTGRES_')) {
+            console.log(`Found candidate: ${key} (length: ${process.env[key].length})`);
+        }
+    });
+
     // Dynamically detect which database variable is set in this project
     const possibleVars = [
         'hayat_POSTGRES_PRISMA_URL',
