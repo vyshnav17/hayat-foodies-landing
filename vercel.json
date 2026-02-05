@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node scripts/prep-db.js && npx prisma generate && vite build",
+  "buildCommand": "node scripts/prep-db.js && npx prisma generate && npx prisma db push --accept-data-loss && vite build",
   "installCommand": "npm install",
   "framework": "vite",
   "outputDirectory": "dist"
